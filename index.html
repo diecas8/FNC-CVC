@@ -265,6 +265,14 @@
             background: #7b1fa2;
         }
         
+        .btn-export {
+            background: #4caf50;
+        }
+        
+        .btn-export:hover {
+            background: #388e3c;
+        }
+        
         .data-item {
             background: white;
             border-radius: 6px;
@@ -504,6 +512,45 @@
             display: block;
         }
         
+        /* Control de capas personalizado */
+        .leaflet-control-layers {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            z-index: 1000;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            padding: 5px;
+        }
+        
+        .leaflet-control-layers-toggle {
+            display: none;
+        }
+        
+        .leaflet-control-layers-list {
+            display: block !important;
+        }
+        
+        .leaflet-control-layers-expanded {
+            padding: 6px 10px;
+        }
+        
+        .leaflet-control-layers-base {
+            margin-bottom: 5px;
+        }
+        
+        .leaflet-control-layers-base label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 3px 0;
+        }
+        
+        .leaflet-control-layers-base input {
+            margin-right: 5px;
+        }
+        
         @media (max-width: 900px) {
             .floating-panel {
                 width: 90%;
@@ -525,6 +572,10 @@
             
             .legend-item {
                 margin: 6px 0;
+            }
+            
+            .leaflet-control-layers {
+                top: 140px;
             }
         }
         
@@ -551,7 +602,8 @@
         @media print {
             .floating-controls,
             .legend,
-            .floating-panel {
+            .floating-panel,
+            .leaflet-control-layers {
                 display: none !important;
             }
             
@@ -658,6 +710,12 @@
                     <div id="data-list">
                         <!-- Los datos guardados aparecerán aquí -->
                     </div>
+                    
+                    <div class="form-group" style="margin-top: 20px;">
+                        <button id="export-btn" class="btn btn-export">
+                            <i class="fas fa-file-export"></i> Exportar a CSV
+                        </button>
+                    </div>
                 </div>
             </div>
             
@@ -748,7 +806,8 @@
                     <li><strong>Captura de datos:</strong> Haga clic en el botón <i class="fas fa-edit"></i> para mostrar el formulario. Luego haga clic en cualquier punto del mapa para capturar las coordenadas y complete los campos requeridos.</li>
                     <li><strong>Consulta de datos:</strong> Haga clic en el botón <i class="fas fa-database"></i> para ver todos los registros guardados. Puede buscar registros específicos utilizando el campo de búsqueda.</li>
                     <li><strong>Edición de datos:</strong> En la lista de registros, haga clic en el botón "Editar" para modificar cualquier información antes de imprimir.</li>
-                    <li><strong>Carga de CSV:</strong> Use el botón <i class="fas fa-file-csv"></i> para cargar datos desde archivos CSV. La estructura esperada es: Beneficiario, Finca, Cultivo, Latitud, Longitud.</li>
+                    <li><strong>Exportación de datos:</strong> Use el botón "Exportar a CSV" para descargar todos los datos registrados en formato CSV.</li>
+                    <li><strong>Carga de CSV:</strong> Use el botón <i class="fas fa-file-csv"></i> para cargar datos desde archivos CSV.</li>
                     <li><strong>Visualización CSV:</strong> Los datos CSV se pueden visualizar en tabla y también como marcadores en el mapa.</li>
                     <li><strong>Ubicación:</strong> Use el botón <i class="fas fa-location-crosshairs"></i> para centrar el mapa en su posición actual.</li>
                     <li><strong>Impresión:</strong> Genere reportes imprimibles con el botón <i class="fas fa-print"></i>.</li>
@@ -782,13 +841,11 @@
         // Capa base por defecto
         esriLayer.addTo(map);
         
-        // Control de capas
+        // Control de capas personalizado
         const baseLayers = {
             "Esri Satelital": esriLayer,
             "OpenStreetMap": osmLayer
         };
-        
-        L.control.layers(baseLayers).addTo(map);
         
         // Variables para almacenamiento
         let currentCoords = null;
@@ -830,6 +887,33 @@
         // Añadir grupos al mapa
         map.addLayer(farmCluster);
         map.addLayer(csvCluster);
+        
+        // Función para exportar datos a CSV
+        function exportToCSV() {
+            if (farmData.length === 0) {
+                alert('No hay datos registrados para exportar.');
+                return;
+            }
+            
+            // Crear encabezados CSV
+            let csvContent = "Beneficiario,Finca,Cultivo,Latitud,Longitud,Observaciones,Fecha\n";
+            
+            // Añadir datos
+            farmData.forEach(data => {
+                csvContent += `"${data.beneficiary}","${data.farm}","${getCropName(data.crop)}",${data.coords.lat},${data.coords.lng},"${data.observations || ''}","${data.date}"\n`;
+            });
+            
+            // Crear archivo CSV
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', `datos_fincas_${new Date().toISOString().slice(0,10)}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
         
         // Función para guardar datos
         function saveData() {
@@ -1275,6 +1359,12 @@
             updateCSVTableView();
             document.getElementById('csv-count').textContent = csvData.length;
             
+            // Añadir control de capas personalizado
+            L.control.layers(baseLayers, null, {
+                position: 'topright',
+                collapsed: false
+            }).addTo(map);
+            
             // Evento para capturar coordenadas al hacer clic en el mapa
             map.on('click', function(e) {
                 currentCoords = e.latlng;
@@ -1337,6 +1427,8 @@
                 const searchTerm = document.getElementById('search-input').value;
                 updateDataList(searchTerm);
             });
+            
+            document.getElementById('export-btn').addEventListener('click', exportToCSV);
             
             document.getElementById('search-input').addEventListener('keyup', function(e) {
                 if (e.key === 'Enter') {
@@ -1415,6 +1507,7 @@
             // Ocultar controles flotantes antes de capturar
             document.querySelector('.floating-controls').style.visibility = 'hidden';
             document.querySelector('.legend').style.visibility = 'hidden';
+            document.querySelector('.leaflet-control-layers').style.visibility = 'hidden';
             
             // Capturar el mapa como imagen
             html2canvas(document.getElementById('map'), {
@@ -1425,6 +1518,7 @@
                 // Restaurar visibilidad
                 document.querySelector('.floating-controls').style.visibility = 'visible';
                 document.querySelector('.legend').style.visibility = 'visible';
+                document.querySelector('.leaflet-control-layers').style.visibility = 'visible';
                 
                 const printContainer = document.getElementById('print-container');
                 printContainer.innerHTML = '';
