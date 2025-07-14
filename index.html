@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geoportal - Seguridad Alimentaria | FNC y CVC</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+        }
+        
+        header {
+            grid-column: 1 / -1;
+            background: linear-gradient(to right, #1a5f23, #2e7d32);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo {
+            width: 70px;
+            height: 70px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #2e7d32;
+            font-size: 12px;
+            text-align: center;
+            padding: 5px;
+        }
+        
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+        
+        .map-container {
+            height: 78vh;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+            position: relative;
+            grid-column: 1 / -1;
+        }
+        
+        #map {
+            height: 100%;
+            width: 100%;
+            z-index: 1;
+        }
+        
+        .floating-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+        }
+        
+        .floating-btn {
+            background: white;
+            color: #2e7d32;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .floating-btn:hover {
+            background: #2e7d32;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .floating-btn.active {
+            background: #2e7d32;
+            color: white;
+        }
+        
+        .floating-panel {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+            width: 350px;
+            z-index: 1000;
+            display: none;
+            max-height: calc(78vh - 100px);
+            overflow-y: auto;
+        }
+        
+        .floating-panel.active {
+            display: block;
+        }
+        
+        .panel {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 4px solid #2e7d32;
+            margin-bottom: 20px;
+        }
+        
+        .panel h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #2e7d32;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        textarea {
+            height: 80px;
+            resize: vertical;
+        }
+        
+        .coordinates {
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        
+        .btn {
+            background: #2e7d32;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            background: #1b5e20;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #5c6bc0;
+        }
+        
+        .btn-secondary:hover {
+            background: #3f51b5;
+        }
+        
+        .btn-print {
+            background: #1565c0;
+        }
+        
+        .btn-print:hover {
+            background: #0d47a1;
+        }
+        
+        .btn-edit {
+            background: #ff9800;
+        }
+        
+        .btn-edit:hover {
+            background: #f57c00;
+        }
+        
+        .btn-delete {
+            background: #f44336;
+        }
+        
+        .btn-delete:hover {
+            background: #d32f2f;
+        }
+        
+        .btn-csv {
+            background: #9c27b0;
+        }
+        
+        .btn-csv:hover {
+            background: #7b1fa2;
+        }
+        
+        .data-item {
+            background: white;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-left: 3px solid #4caf50;
+            position: relative;
+        }
+        
+        .data-item h3 {
+            font-size: 16px;
+            color: #1b5e20;
+            margin-bottom: 5px;
+        }
+        
+        .data-item p {
+            font-size: 14px;
+            color: #555;
+            margin: 3px 0;
+        }
+        
+        .data-item .actions {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 12px;
+            border-radius: 5px;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            font-size: 14px;
+            max-width: 200px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+        
+        .color-finca {
+            background: #e91e63;
+        }
+        
+        .color-beneficiario {
+            background: #2196f3;
+        }
+        
+        .color-ubicacion {
+            background: #ff9800;
+        }
+        
+        .color-edit {
+            background: #ffc107;
+        }
+        
+        .color-csv {
+            background: #9c27b0;
+        }
+        
+        .print-container {
+            position: absolute;
+            left: -9999px;
+            width: 21cm;
+            height: 29.7cm;
+            padding: 1cm;
+            background: white;
+        }
+        
+        footer {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 14px;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .search-container input {
+            flex-grow: 1;
+        }
+        
+        .search-container button {
+            width: auto;
+            padding: 10px 15px;
+        }
+        
+        .instructions-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            display: none;
+        }
+        
+        .instructions-content {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .instructions-content h2 {
+            color: #2e7d32;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .instructions-content ul {
+            padding-left: 20px;
+            margin: 20px 0;
+        }
+        
+        .instructions-content li {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #f44336;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .csv-upload-container {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f3e5f5;
+            border-radius: 8px;
+            border: 2px dashed #9c27b0;
+        }
+        
+        .csv-table-container {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .csv-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .csv-table th {
+            background: #7b1fa2;
+            color: white;
+            padding: 10px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+        }
+        
+        .csv-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .csv-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .csv-table tr:hover {
+            background-color: #f3e5f5;
+        }
+        
+        .tab-container {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #2e7d32;
+        }
+        
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            background: #f8f9fa;
+            border-radius: 5px 5px 0 0;
+        }
+        
+        .tab.active {
+            background: #2e7d32;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @media (max-width: 900px) {
+            .floating-panel {
+                width: 90%;
+                left: 5%;
+                right: auto;
+            }
+            
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .legend {
+                max-width: 180px;
+                font-size: 13px;
+                padding: 10px;
+                left: 10px;
+                bottom: 10px;
+            }
+            
+            .legend-item {
+                margin: 6px 0;
+            }
+        }
+        
+        /* Clúster de marcadores personalizado */
+        .marker-cluster-custom {
+            background: rgba(233, 30, 99, 0.6);
+        }
+        
+        .marker-cluster-custom div {
+            background: rgba(233, 30, 99, 0.8);
+            color: white;
+        }
+        
+        .marker-cluster-csv {
+            background: rgba(156, 39, 176, 0.6);
+        }
+        
+        .marker-cluster-csv div {
+            background: rgba(156, 39, 176, 0.8);
+            color: white;
+        }
+        
+        /* Estilos para impresión */
+        @media print {
+            .floating-controls,
+            .legend,
+            .floating-panel {
+                display: none !important;
+            }
+            
+            .map-container {
+                height: 80vh;
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <div class="logo">FNC<br>&<br>CVC</div>
+                <div>
+                    <h1>Geoportal - Seguridad Alimentaria</h1>
+                    <div class="subtitle">Convenio FNC y CVC | Departamento del Valle del Cauca, Colombia</div>
+                </div>
+            </div>
+            <div id="current-date">14 de Julio, 2025</div>
+        </header>
+        
+        <div class="map-container">
+            <div id="map"></div>
+            
+            <div class="floating-controls">
+                <button id="form-btn" class="floating-btn" title="Mostrar formulario">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button id="data-btn" class="floating-btn" title="Mostrar datos guardados">
+                    <i class="fas fa-database"></i>
+                </button>
+                <button id="csv-btn" class="floating-btn" title="Cargar datos CSV">
+                    <i class="fas fa-file-csv"></i>
+                </button>
+                <button id="location-btn" class="floating-btn" title="Centrar en mi ubicación">
+                    <i class="fas fa-location-crosshairs"></i>
+                </button>
+                <button id="print-btn" class="floating-btn" title="Imprimir mapa">
+                    <i class="fas fa-print"></i>
+                </button>
+                <button id="help-btn" class="floating-btn" title="Instrucciones de uso">
+                    <i class="fas fa-question-circle"></i>
+                </button>
+            </div>
+            
+            <!-- Panel flotante para formulario -->
+            <div id="form-panel" class="floating-panel">
+                <div class="panel">
+                    <h2><i class="fas fa-map-marker-alt"></i> Captura de Datos</h2>
+                    <div class="coordinates" id="coordinates">Haga clic en el mapa para capturar coordenadas</div>
+                    
+                    <div class="form-group">
+                        <label for="beneficiary">Nombre del Beneficiario *</label>
+                        <input type="text" id="beneficiary" placeholder="Ingrese el nombre completo">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="farm">Nombre de la Finca *</label>
+                        <input type="text" id="farm" placeholder="Ingrese el nombre de la finca">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="crop">Cultivo Principal *</label>
+                        <select id="crop">
+                            <option value="">Seleccione un cultivo</option>
+                            <option value="cafe">Café</option>
+                            <option value="platano">Plátano</option>
+                            <option value="maiz">Maíz</option>
+                            <option value="frijol">Frijol</option>
+                            <option value="hortalizas">Hortalizas</option>
+                            <option value="frutales">Frutales</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="observations">Observaciones</label>
+                        <textarea id="observations" placeholder="Ingrese observaciones adicionales"></textarea>
+                    </div>
+                    
+                    <button id="save-btn" class="btn">
+                        <i class="fas fa-save"></i> Guardar Datos
+                    </button>
+                    <button id="cancel-edit-btn" class="btn btn-delete" style="display: none; margin-top: 10px;">
+                        <i class="fas fa-times"></i> Cancelar Edición
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Panel flotante para datos -->
+            <div id="data-panel" class="floating-panel">
+                <div class="panel">
+                    <h2><i class="fas fa-search"></i> Consultar Datos</h2>
+                    
+                    <div class="search-container">
+                        <input type="text" id="search-input" placeholder="Buscar por nombre o finca...">
+                        <button id="search-btn" class="btn btn-secondary">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    
+                    <div id="data-list">
+                        <!-- Los datos guardados aparecerán aquí -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Panel flotante para CSV -->
+            <div id="csv-panel" class="floating-panel">
+                <div class="panel">
+                    <h2><i class="fas fa-file-csv"></i> Cargar Datos CSV</h2>
+                    
+                    <div class="csv-upload-container">
+                        <div class="form-group">
+                            <label for="csv-file">Seleccionar archivo CSV</label>
+                            <input type="file" id="csv-file" accept=".csv">
+                        </div>
+                        
+                        <div class="form-group">
+                            <button id="load-csv-btn" class="btn btn-csv">
+                                <i class="fas fa-upload"></i> Cargar Datos
+                            </button>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Estructura CSV esperada:</label>
+                            <div class="coordinates">
+                                Beneficiario,Finca,Cultivo,Latitud,Longitud
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-container">
+                        <div class="tab active" data-tab="csv-data">Datos CSV</div>
+                        <div class="tab" data-tab="map-view">Visualización</div>
+                    </div>
+                    
+                    <div class="tab-content active" id="csv-data">
+                        <div id="csv-table-container" class="csv-table-container">
+                            <!-- Tabla de datos CSV aparecerá aquí -->
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="map-view">
+                        <div class="form-group">
+                            <label>Datos cargados: <span id="csv-count">0</span> registros</label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <button id="plot-csv-btn" class="btn btn-csv">
+                                <i class="fas fa-map-marker-alt"></i> Mostrar en Mapa
+                            </button>
+                            <button id="clear-csv-btn" class="btn btn-delete" style="margin-top: 10px;">
+                                <i class="fas fa-trash"></i> Limpiar Datos CSV
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color color-finca"></div>
+                    <span>Fincas Registradas</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color color-csv"></div>
+                    <span>Datos CSV</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color color-beneficiario"></div>
+                    <span>Beneficiarios</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color color-ubicacion"></div>
+                    <span>Su Ubicación</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color color-edit"></div>
+                    <span>Edición</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions-overlay" id="instructions-overlay">
+            <div class="instructions-content">
+                <button class="close-btn" id="close-instructions">
+                    <i class="fas fa-times"></i>
+                </button>
+                <h2><i class="fas fa-info-circle"></i> Instrucciones de Uso</h2>
+                <ul>
+                    <li><strong>Captura de datos:</strong> Haga clic en el botón <i class="fas fa-edit"></i> para mostrar el formulario. Luego haga clic en cualquier punto del mapa para capturar las coordenadas y complete los campos requeridos.</li>
+                    <li><strong>Consulta de datos:</strong> Haga clic en el botón <i class="fas fa-database"></i> para ver todos los registros guardados. Puede buscar registros específicos utilizando el campo de búsqueda.</li>
+                    <li><strong>Edición de datos:</strong> En la lista de registros, haga clic en el botón "Editar" para modificar cualquier información antes de imprimir.</li>
+                    <li><strong>Carga de CSV:</strong> Use el botón <i class="fas fa-file-csv"></i> para cargar datos desde archivos CSV. La estructura esperada es: Beneficiario, Finca, Cultivo, Latitud, Longitud.</li>
+                    <li><strong>Visualización CSV:</strong> Los datos CSV se pueden visualizar en tabla y también como marcadores en el mapa.</li>
+                    <li><strong>Ubicación:</strong> Use el botón <i class="fas fa-location-crosshairs"></i> para centrar el mapa en su posición actual.</li>
+                    <li><strong>Impresión:</strong> Genere reportes imprimibles con el botón <i class="fas fa-print"></i>.</li>
+                </ul>
+                <p><strong>Nota:</strong> Los campos marcados con * son obligatorios para guardar un registro.</p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Sistema Geoportal para Seguridad Alimentaria - Convenio FNC y CVC | Departamento del Valle del Cauca, Colombia</p>
+            <p>Datos almacenados localmente en este dispositivo | Elaborado por Diego Castaño Esp. en SIG | © 2025</p>
+        </footer>
+    </div>
+    
+    <!-- Contenedor oculto para impresión -->
+    <div id="print-container" class="print-container"></div>
+
+    <script>
+        // Inicializar mapa
+        const map = L.map('map').setView([3.4516, -76.5320], 10); // Centro en Valle del Cauca
+        
+        // Capas base
+        const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        });
+        
+        const esriLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics'
+        });
+        
+        // Capa base por defecto
+        esriLayer.addTo(map);
+        
+        // Control de capas
+        const baseLayers = {
+            "Esri Satelital": esriLayer,
+            "OpenStreetMap": osmLayer
+        };
+        
+        L.control.layers(baseLayers).addTo(map);
+        
+        // Variables para almacenamiento
+        let currentCoords = null;
+        let farmData = JSON.parse(localStorage.getItem('farmData')) || [];
+        let tempMarkers = [];
+        let userMarker = null;
+        let editingId = null;
+        let csvData = JSON.parse(localStorage.getItem('csvData')) || [];
+        
+        // Grupos de clústeres para evitar superposición
+        const farmCluster = L.markerClusterGroup({
+            iconCreateFunction: function(cluster) {
+                return L.divIcon({
+                    html: '<div><span>' + cluster.getChildCount() + '</span></div>',
+                    className: 'marker-cluster-custom',
+                    iconSize: L.point(40, 40)
+                });
+            },
+            spiderfyOnMaxZoom: true,
+            showCoverageOnHover: false,
+            zoomToBoundsOnClick: true,
+            maxClusterRadius: 60
+        });
+        
+        const csvCluster = L.markerClusterGroup({
+            iconCreateFunction: function(cluster) {
+                return L.divIcon({
+                    html: '<div><span>' + cluster.getChildCount() + '</span></div>',
+                    className: 'marker-cluster-csv',
+                    iconSize: L.point(40, 40)
+                });
+            },
+            spiderfyOnMaxZoom: true,
+            showCoverageOnHover: false,
+            zoomToBoundsOnClick: true,
+            maxClusterRadius: 60
+        });
+        
+        // Añadir grupos al mapa
+        map.addLayer(farmCluster);
+        map.addLayer(csvCluster);
+        
+        // Función para guardar datos
+        function saveData() {
+            if (!currentCoords) {
+                alert('Por favor, seleccione una ubicación en el mapa primero.');
+                return;
+            }
+            
+            const beneficiary = document.getElementById('beneficiary').value;
+            const farm = document.getElementById('farm').value;
+            const crop = document.getElementById('crop').value;
+            const observations = document.getElementById('observations').value;
+            
+            if (!beneficiary || !farm || !crop) {
+                alert('Por favor, complete todos los campos obligatorios (*).');
+                return;
+            }
+            
+            // Crear objeto con los datos
+            const data = {
+                id: editingId || Date.now(),
+                coords: currentCoords,
+                beneficiary,
+                farm,
+                crop,
+                observations,
+                date: new Date().toLocaleDateString('es-CO')
+            };
+            
+            if (editingId) {
+                // Actualizar registro existente
+                const index = farmData.findIndex(item => item.id === editingId);
+                if (index !== -1) {
+                    farmData[index] = data;
+                }
+                // Salir del modo edición
+                cancelEdit();
+            } else {
+                // Nuevo registro
+                farmData.push(data);
+            }
+            
+            // Guardar en localStorage
+            localStorage.setItem('farmData', JSON.stringify(farmData));
+            
+            // Actualizar marcadores y lista
+            updateMapMarkers();
+            updateDataList();
+            
+            // Limpiar formulario
+            document.getElementById('beneficiary').value = '';
+            document.getElementById('farm').value = '';
+            document.getElementById('crop').value = '';
+            document.getElementById('observations').value = '';
+            document.getElementById('coordinates').textContent = 'Datos guardados! Seleccione nueva ubicación';
+            currentCoords = null;
+            clearTempMarkers();
+            
+            alert('Datos guardados correctamente en este dispositivo.');
+        }
+        
+        // Función para actualizar marcadores en el mapa
+        function updateMapMarkers() {
+            // Eliminar todos los marcadores existentes del clúster
+            farmCluster.clearLayers();
+            
+            // Añadir nuevos marcadores al clúster
+            farmData.forEach(data => {
+                const marker = L.marker(data.coords, {
+                    icon: L.divIcon({
+                        className: 'farm-marker',
+                        html: `<div style="background-color:${editingId === data.id ? '#ffc107' : '#e91e63'}; width:24px; height:24px; border-radius:50%; border:2px solid white; box-shadow:0 0 10px rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center;">
+                                <i class="fas fa-tractor" style="color:white; font-size:12px;"></i>
+                           </div>`,
+                        iconSize: [28, 28]
+                    })
+                });
+                
+                marker.bindPopup(`
+                    <b>${data.farm}</b><br>
+                    Beneficiario: ${data.beneficiary}<br>
+                    Cultivo: ${getCropName(data.crop)}<br>
+                    Fecha: ${data.date}
+                `);
+                
+                farmCluster.addLayer(marker);
+            });
+        }
+        
+        // Función para obtener nombre del cultivo
+        function getCropName(cropKey) {
+            const crops = {
+                'cafe': 'Café',
+                'platano': 'Plátano',
+                'maiz': 'Maíz',
+                'frijol': 'Frijol',
+                'hortalizas': 'Hortalizas',
+                'frutales': 'Frutales'
+            };
+            return crops[cropKey] || cropKey;
+        }
+        
+        // Actualizar lista de datos
+        function updateDataList(filter = '') {
+            const dataList = document.getElementById('data-list');
+            dataList.innerHTML = '';
+            
+            const filteredData = farmData.filter(data => 
+                data.beneficiary.toLowerCase().includes(filter.toLowerCase()) || 
+                data.farm.toLowerCase().includes(filter.toLowerCase())
+            );
+            
+            if (filteredData.length === 0) {
+                dataList.innerHTML = '<div class="data-item"><p>No se encontraron registros</p></div>';
+                return;
+            }
+            
+            filteredData.forEach(data => {
+                const item = document.createElement('div');
+                item.className = 'data-item';
+                item.innerHTML = `
+                    <h3>${data.farm}</h3>
+                    <p><strong>Beneficiario:</strong> ${data.beneficiary}</p>
+                    <p><strong>Cultivo:</strong> ${getCropName(data.crop)}</p>
+                    <p><strong>Ubicación:</strong> ${data.coords.lat.toFixed(6)}, ${data.coords.lng.toFixed(6)}</p>
+                    <p><strong>Fecha:</strong> ${data.date}</p>
+                    <div class="actions">
+                        <button class="btn btn-edit edit-btn" data-id="${data.id}">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button class="btn btn-delete delete-btn" data-id="${data.id}">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                    </div>
+                `;
+                dataList.appendChild(item);
+            });
+            
+            // Agregar event listeners a los botones
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = parseInt(this.getAttribute('data-id'));
+                    editData(id);
+                });
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = parseInt(this.getAttribute('data-id'));
+                    deleteData(id);
+                });
+            });
+        }
+        
+        // Función para editar datos
+        function editData(id) {
+            const data = farmData.find(item => item.id === id);
+            if (!data) return;
+            
+            // Mostrar formulario
+            showFormPanel();
+            
+            // Rellenar formulario con datos
+            document.getElementById('beneficiary').value = data.beneficiary;
+            document.getElementById('farm').value = data.farm;
+            document.getElementById('crop').value = data.crop;
+            document.getElementById('observations').value = data.observations || '';
+            
+            // Establecer coordenadas
+            currentCoords = data.coords;
+            document.getElementById('coordinates').textContent = 
+                `Lat: ${currentCoords.lat.toFixed(6)}, Lng: ${currentCoords.lng.toFixed(6)}`;
+            
+            // Centrar mapa en la ubicación
+            map.setView(currentCoords, 15);
+            
+            // Limpiar marcadores temporales
+            clearTempMarkers();
+            
+            // Añadir marcador temporal para edición
+            const marker = L.marker(currentCoords, {
+                icon: L.divIcon({
+                    className: 'temp-marker',
+                    html: '<div style="background-color:#ffc107; width:24px; height:24px; border-radius:50%; border:2px solid white; box-shadow:0 0 10px rgba(0,0,0,0.5);"></div>',
+                    iconSize: [28, 28]
+                })
+            }).addTo(map);
+            
+            tempMarkers.push(marker);
+            
+            // Activar modo edición
+            editingId = id;
+            document.getElementById('cancel-edit-btn').style.display = 'block';
+            
+            // Actualizar marcadores para resaltar el que se está editando
+            updateMapMarkers();
+        }
+        
+        // Cancelar edición
+        function cancelEdit() {
+            editingId = null;
+            document.getElementById('cancel-edit-btn').style.display = 'none';
+            
+            // Limpiar formulario
+            document.getElementById('beneficiary').value = '';
+            document.getElementById('farm').value = '';
+            document.getElementById('crop').value = '';
+            document.getElementById('observations').value = '';
+            document.getElementById('coordinates').textContent = 'Haga clic en el mapa para capturar coordenadas';
+            currentCoords = null;
+            
+            // Actualizar marcadores
+            updateMapMarkers();
+            clearTempMarkers();
+        }
+        
+        // Función para eliminar datos
+        function deleteData(id) {
+            if (!confirm('¿Está seguro de que desea eliminar este registro?')) return;
+            
+            farmData = farmData.filter(item => item.id !== id);
+            localStorage.setItem('farmData', JSON.stringify(farmData));
+            
+            updateMapMarkers();
+            updateDataList();
+        }
+        
+        // Función para limpiar marcadores temporales
+        function clearTempMarkers() {
+            tempMarkers.forEach(marker => map.removeLayer(marker));
+            tempMarkers.length = 0;
+        }
+        
+        // Mostrar panel de formulario
+        function showFormPanel() {
+            document.getElementById('data-panel').classList.remove('active');
+            document.getElementById('csv-panel').classList.remove('active');
+            document.getElementById('form-panel').classList.add('active');
+            document.getElementById('form-btn').classList.add('active');
+            document.getElementById('data-btn').classList.remove('active');
+            document.getElementById('csv-btn').classList.remove('active');
+        }
+        
+        // Mostrar panel de datos
+        function showDataPanel() {
+            document.getElementById('form-panel').classList.remove('active');
+            document.getElementById('csv-panel').classList.remove('active');
+            document.getElementById('data-panel').classList.add('active');
+            document.getElementById('data-btn').classList.add('active');
+            document.getElementById('form-btn').classList.remove('active');
+            document.getElementById('csv-btn').classList.remove('active');
+        }
+        
+        // Mostrar panel de CSV
+        function showCSVPanel() {
+            document.getElementById('form-panel').classList.remove('active');
+            document.getElementById('data-panel').classList.remove('active');
+            document.getElementById('csv-panel').classList.add('active');
+            document.getElementById('csv-btn').classList.add('active');
+            document.getElementById('form-btn').classList.remove('active');
+            document.getElementById('data-btn').classList.remove('active');
+        }
+        
+        // Cerrar todos los paneles
+        function closePanels() {
+            document.getElementById('form-panel').classList.remove('active');
+            document.getElementById('data-panel').classList.remove('active');
+            document.getElementById('csv-panel').classList.remove('active');
+            document.getElementById('form-btn').classList.remove('active');
+            document.getElementById('data-btn').classList.remove('active');
+            document.getElementById('csv-btn').classList.remove('active');
+        }
+        
+        // Función para cargar datos CSV
+        function loadCSV() {
+            const fileInput = document.getElementById('csv-file');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Por favor, seleccione un archivo CSV.');
+                return;
+            }
+            
+            Papa.parse(file, {
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    if (results.errors.length > 0) {
+                        alert('Se encontraron errores en el archivo CSV: ' + results.errors[0].message);
+                        return;
+                    }
+                    
+                    // Validar estructura básica
+                    const validFields = ['beneficiario', 'finca', 'cultivo', 'latitud', 'longitud'];
+                    const firstRow = results.data[0];
+                    
+                    if (!firstRow) {
+                        alert('El archivo CSV está vacío o no tiene datos válidos.');
+                        return;
+                    }
+                    
+                    const hasValidFields = validFields.every(field => 
+                        Object.keys(firstRow).some(key => key.toLowerCase().includes(field))
+                    );
+                    
+                    if (!hasValidFields) {
+                        alert('La estructura del CSV no es válida. Se requieren campos: Beneficiario, Finca, Cultivo, Latitud, Longitud');
+                        return;
+                    }
+                    
+                    // Normalizar datos
+                    csvData = results.data.map(row => {
+                        // Normalizar nombres de columnas
+                        const normalizedRow = {};
+                        Object.keys(row).forEach(key => {
+                            const normalizedKey = key.toLowerCase();
+                            if (normalizedKey.includes('beneficiario')) normalizedRow.beneficiario = row[key];
+                            if (normalizedKey.includes('finca')) normalizedRow.finca = row[key];
+                            if (normalizedKey.includes('cultivo')) normalizedRow.cultivo = row[key];
+                            if (normalizedKey.includes('latitud')) normalizedRow.latitud = parseFloat(row[key]);
+                            if (normalizedKey.includes('longitud')) normalizedRow.longitud = parseFloat(row[key]);
+                        });
+                        return normalizedRow;
+                    }).filter(row => 
+                        row.beneficiario && row.finca && row.cultivo && 
+                        !isNaN(row.latitud) && !isNaN(row.longitud)
+                    );
+                    
+                    if (csvData.length === 0) {
+                        alert('No se encontraron datos válidos en el archivo CSV.');
+                        return;
+                    }
+                    
+                    // Guardar en localStorage
+                    localStorage.setItem('csvData', JSON.stringify(csvData));
+                    
+                    // Actualizar vista
+                    updateCSVTableView();
+                    document.getElementById('csv-count').textContent = csvData.length;
+                    
+                    alert(`Se cargaron ${csvData.length} registros desde el archivo CSV.`);
+                }
+            });
+        }
+        
+        // Actualizar vista de tabla CSV
+        function updateCSVTableView() {
+            const container = document.getElementById('csv-table-container');
+            if (csvData.length === 0) {
+                container.innerHTML = '<div class="data-item"><p>No hay datos CSV cargados</p></div>';
+                return;
+            }
+            
+            let tableHTML = `
+                <table class="csv-table">
+                    <thead>
+                        <tr>
+                            <th>Beneficiario</th>
+                            <th>Finca</th>
+                            <th>Cultivo</th>
+                            <th>Latitud</th>
+                            <th>Longitud</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            csvData.forEach(row => {
+                tableHTML += `
+                    <tr>
+                        <td>${row.beneficiario || ''}</td>
+                        <td>${row.finca || ''}</td>
+                        <td>${row.cultivo || ''}</td>
+                        <td>${row.latitud.toFixed(6)}</td>
+                        <td>${row.longitud.toFixed(6)}</td>
+                    </tr>
+                `;
+            });
+            
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = tableHTML;
+        }
+        
+        // Función para mostrar datos CSV en el mapa
+        function plotCSVData() {
+            // Eliminar marcadores CSV anteriores
+            csvCluster.clearLayers();
+            
+            if (csvData.length === 0) {
+                alert('No hay datos CSV cargados para mostrar en el mapa.');
+                return;
+            }
+            
+            // Añadir nuevos marcadores
+            csvData.forEach(row => {
+                const coords = [row.latitud, row.longitud];
+                const marker = L.marker(coords, {
+                    icon: L.divIcon({
+                        className: 'csv-marker',
+                        html: `<div style="background-color:#9c27b0; width:22px; height:22px; border-radius:50%; border:2px solid white; box-shadow:0 0 10px rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center;">
+                                <i class="fas fa-file-csv" style="color:white; font-size:10px;"></i>
+                           </div>`,
+                        iconSize: [26, 26]
+                    })
+                });
+                
+                marker.bindPopup(`
+                    <b>${row.finca}</b><br>
+                    Beneficiario: ${row.beneficiario}<br>
+                    Cultivo: ${row.cultivo}
+                `);
+                
+                csvCluster.addLayer(marker);
+            });
+            
+            // Ajustar vista del mapa para mostrar todos los marcadores
+            const bounds = L.latLngBounds(csvData.map(row => [row.latitud, row.longitud]));
+            map.fitBounds(bounds, { padding: [50, 50] });
+        }
+        
+        // Limpiar datos CSV
+        function clearCSVData() {
+            if (!confirm('¿Está seguro de que desea eliminar todos los datos CSV cargados?')) return;
+            
+            csvData = [];
+            localStorage.removeItem('csvData');
+            updateCSVTableView();
+            csvCluster.clearLayers();
+            document.getElementById('csv-count').textContent = '0';
+        }
+        
+        // Eventos al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cargar datos existentes
+            updateMapMarkers();
+            updateDataList();
+            
+            // Cargar datos CSV si existen
+            updateCSVTableView();
+            document.getElementById('csv-count').textContent = csvData.length;
+            
+            // Evento para capturar coordenadas al hacer clic en el mapa
+            map.on('click', function(e) {
+                currentCoords = e.latlng;
+                document.getElementById('coordinates').textContent = 
+                    `Lat: ${currentCoords.lat.toFixed(6)}, Lng: ${currentCoords.lng.toFixed(6)}`;
+                
+                // Limpiar marcadores temporales
+                clearTempMarkers();
+                
+                // Añadir marcador temporal
+                const marker = L.marker(currentCoords, {
+                    icon: L.divIcon({
+                        className: 'temp-marker',
+                        html: '<div style="background-color:#e91e63; width:24px; height:24px; border-radius:50%; border:2px solid white; box-shadow:0 0 10px rgba(0,0,0,0.5);"></div>',
+                        iconSize: [28, 28]
+                    })
+                }).addTo(map);
+                
+                tempMarkers.push(marker);
+            });
+            
+            // Botones de control flotantes
+            document.getElementById('form-btn').addEventListener('click', function() {
+                if (document.getElementById('form-panel').classList.contains('active')) {
+                    closePanels();
+                } else {
+                    showFormPanel();
+                }
+            });
+            
+            document.getElementById('data-btn').addEventListener('click', function() {
+                if (document.getElementById('data-panel').classList.contains('active')) {
+                    closePanels();
+                } else {
+                    showDataPanel();
+                }
+            });
+            
+            document.getElementById('csv-btn').addEventListener('click', function() {
+                if (document.getElementById('csv-panel').classList.contains('active')) {
+                    closePanels();
+                } else {
+                    showCSVPanel();
+                }
+            });
+            
+            document.getElementById('location-btn').addEventListener('click', locateUser);
+            document.getElementById('print-btn').addEventListener('click', printMap);
+            document.getElementById('help-btn').addEventListener('click', function() {
+                document.getElementById('instructions-overlay').style.display = 'flex';
+            });
+            
+            document.getElementById('close-instructions').addEventListener('click', function() {
+                document.getElementById('instructions-overlay').style.display = 'none';
+            });
+            
+            document.getElementById('save-btn').addEventListener('click', saveData);
+            document.getElementById('cancel-edit-btn').addEventListener('click', cancelEdit);
+            document.getElementById('search-btn').addEventListener('click', function() {
+                const searchTerm = document.getElementById('search-input').value;
+                updateDataList(searchTerm);
+            });
+            
+            document.getElementById('search-input').addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    updateDataList(this.value);
+                }
+            });
+            
+            // CSV handlers
+            document.getElementById('load-csv-btn').addEventListener('click', loadCSV);
+            document.getElementById('plot-csv-btn').addEventListener('click', plotCSVData);
+            document.getElementById('clear-csv-btn').addEventListener('click', clearCSVData);
+            
+            // Tab handlers
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Update tabs
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Update content
+                    const tabId = this.getAttribute('data-tab');
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Actualizar fecha actual
+            document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-CO', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        });
+        
+        // Función para geolocalización
+        function locateUser() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        const userLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        
+                        // Centrar mapa en la ubicación del usuario
+                        map.setView(userLocation, 15);
+                        
+                        // Limpiar marcadores de ubicación anteriores
+                        if (userMarker) map.removeLayer(userMarker);
+                        
+                        // Añadir nuevo marcador
+                        userMarker = L.marker(userLocation, {
+                            icon: L.divIcon({
+                                className: 'user-marker',
+                                html: '<div style="background-color:#ff9800; width:24px; height:24px; border-radius:50%; border:2px solid white; box-shadow:0 0 10px rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center;"><i class="fas fa-user" style="color:white; font-size:12px;"></i></div>',
+                                iconSize: [28, 28]
+                            })
+                        }).addTo(map);
+                        
+                        userMarker.bindPopup('Su ubicación actual').openPopup();
+                    },
+                    error => {
+                        alert('No se pudo obtener su ubicación: ' + error.message);
+                    }
+                );
+            } else {
+                alert('La geolocalización no es soportada por su navegador.');
+            }
+        }
+        
+        // Función para imprimir el mapa
+        function printMap() {
+            // Ocultar controles flotantes antes de capturar
+            document.querySelector('.floating-controls').style.visibility = 'hidden';
+            document.querySelector('.legend').style.visibility = 'hidden';
+            
+            // Capturar el mapa como imagen
+            html2canvas(document.getElementById('map'), {
+                scale: 2, // Aumentar resolución
+                useCORS: true,
+                logging: false
+            }).then(canvas => {
+                // Restaurar visibilidad
+                document.querySelector('.floating-controls').style.visibility = 'visible';
+                document.querySelector('.legend').style.visibility = 'visible';
+                
+                const printContainer = document.getElementById('print-container');
+                printContainer.innerHTML = '';
+                
+                // Crear contenido para imprimir
+                const printContent = document.createElement('div');
+                printContent.style.width = '100%';
+                printContent.style.height = '100%';
+                printContent.style.position = 'relative';
+                
+                // Título
+                const title = document.createElement('h1');
+                title.textContent = 'Reporte de Visitas a Fincas';
+                title.style.textAlign = 'center';
+                title.style.marginBottom = '20px';
+                title.style.color = '#2e7d32';
+                printContent.appendChild(title);
+                
+                // Subtítulo
+                const subtitle = document.createElement('h2');
+                subtitle.textContent = 'Convenio FNC y CVC - Seguridad Alimentaria';
+                subtitle.style.textAlign = 'center';
+                subtitle.style.marginBottom = '30px';
+                subtitle.style.color = '#555';
+                subtitle.style.fontSize = '18px';
+                printContent.appendChild(subtitle);
+                
+                // Mapa impreso
+                const mapImg = document.createElement('img');
+                mapImg.src = canvas.toDataURL('image/png');
+                mapImg.style.width = '100%';
+                mapImg.style.height = '400px';
+                mapImg.style.border = '1px solid #ddd';
+                mapImg.style.marginBottom = '20px';
+                printContent.appendChild(mapImg);
+                
+                // Tabla de datos
+                const table = document.createElement('table');
+                table.style.width = '100%';
+                table.style.borderCollapse = 'collapse';
+                table.style.marginTop = '20px';
+                
+                // Cabecera de tabla
+                const thead = document.createElement('thead');
+                thead.innerHTML = `
+                    <tr style="background-color: #2e7d32; color: white;">
+                        <th style="padding: 10px; text-align: left;">Finca</th>
+                        <th style="padding: 10px; text-align: left;">Beneficiario</th>
+                        <th style="padding: 10px; text-align: left;">Cultivo</th>
+                        <th style="padding: 10px; text-align: left;">Ubicación</th>
+                        <th style="padding: 10px; text-align: left;">Fecha</th>
+                    </tr>
+                `;
+                table.appendChild(thead);
+                
+                // Cuerpo de tabla
+                const tbody = document.createElement('tbody');
+                farmData.forEach(data => {
+                    const row = document.createElement('tr');
+                    row.style.borderBottom = '1px solid #ddd';
+                    row.innerHTML = `
+                        <td style="padding: 10px;">${data.farm}</td>
+                        <td style="padding: 10px;">${data.beneficiary}</td>
+                        <td style="padding: 10px;">${getCropName(data.crop)}</td>
+                        <td style="padding: 10px;">${data.coords.lat.toFixed(6)}, ${data.coords.lng.toFixed(6)}</td>
+                        <td style="padding: 10px;">${data.date}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                table.appendChild(tbody);
+                printContent.appendChild(table);
+                
+                // Fecha y firma
+                const footer = document.createElement('div');
+                footer.style.marginTop = '30px';
+                footer.style.display = 'flex';
+                footer.style.justifyContent = 'space-between';
+                
+                const date = document.createElement('div');
+                date.innerHTML = `<strong>Fecha de generación:</strong> ${new Date().toLocaleDateString('es-CO')}`;
+                footer.appendChild(date);
+                
+                const signature = document.createElement('div');
+                signature.innerHTML = '<strong>Responsable:</strong> ________________________';
+                footer.appendChild(signature);
+                
+                printContent.appendChild(footer);
+                
+                // Crédito
+                const credit = document.createElement('div');
+                credit.style.marginTop = '20px';
+                credit.style.textAlign = 'center';
+                credit.style.fontSize = '12px';
+                credit.style.color = '#777';
+                credit.innerHTML = 'Elaborado por Diego Castaño Esp. en SIG';
+                printContent.appendChild(credit);
+                
+                printContainer.appendChild(printContent);
+                
+                // Abrir ventana de impresión
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <html>
+                    <head>
+                        <title>Reporte de Visitas a Fincas</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+                            @media print {
+                                @page { size: A4; margin: 1cm; }
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        ${printContainer.innerHTML}
+                        <script>
+                            window.onload = function() {
+                                window.print();
+                                window.onafterprint = function() {
+                                    window.close();
+                                };
+                            };
+                        <\/script>
+                    </body>
+                    </html>
+                `);
+                printWindow.document.close();
+            });
+        }
+    </script>
+</body>
+</html>
