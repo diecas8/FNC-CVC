@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Geoportal - Seguridad Alimentaria | FNC y CVC</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
@@ -18,32 +18,31 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
         
         body {
             background: linear-gradient(135deg, #f0f5f9 0%, #e0eaf5 100%);
             min-height: 100vh;
             color: #333;
-            padding: 20px;
             overflow-x: hidden;
+            padding: 10px;
         }
         
         .container {
-            max-width: 1400px;
+            max-width: 100%;
             margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 350px;
-            gap: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
         
         header {
-            grid-column: 1 / -1;
             background: linear-gradient(to right, #1a5f23, #2e7d32);
             color: white;
-            padding: 20px;
+            padding: 15px;
             border-radius: 10px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -54,12 +53,12 @@
         .logo-container {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
         }
         
         .logo {
-            width: 70px;
-            height: 70px;
+            width: 50px;
+            height: 50px;
             background: white;
             border-radius: 50%;
             display: flex;
@@ -67,32 +66,36 @@
             justify-content: center;
             font-weight: bold;
             color: #2e7d32;
-            font-size: 12px;
+            font-size: 10px;
             text-align: center;
-            padding: 5px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            padding: 3px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         
         h1 {
-            font-size: 24px;
+            font-size: 18px;
             font-weight: 700;
-            letter-spacing: 0.5px;
         }
         
         .subtitle {
-            font-size: 16px;
+            font-size: 12px;
             opacity: 0.9;
-            margin-top: 5px;
+            margin-top: 3px;
             font-weight: 300;
         }
         
+        #current-date {
+            font-size: 12px;
+            text-align: right;
+            min-width: 100px;
+        }
+        
         .map-container {
-            height: 78vh;
+            height: 65vh;
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.18);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
             position: relative;
-            grid-column: 1 / -1;
         }
         
         #map {
@@ -103,39 +106,42 @@
         
         .floating-controls {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            bottom: 15px;
+            right: 10px;
             display: flex;
-            flex-direction: column;
-            gap: 10px;
+            flex-direction: row;
+            gap: 8px;
             z-index: 1000;
             background: rgba(255, 255, 255, 0.85);
-            padding: 10px;
+            padding: 8px;
             border-radius: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+            flex-wrap: wrap;
+            max-width: calc(100% - 20px);
+            justify-content: center;
         }
         
         .floating-btn {
             background: white;
             color: #2e7d32;
             border: none;
-            width: 50px;
-            height: 50px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            font-size: 18px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
         }
         
-        .floating-btn:hover {
+        .floating-btn:hover, .floating-btn:active {
             background: #2e7d32;
             color: white;
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
         
         .floating-btn.active {
@@ -144,42 +150,38 @@
         }
         
         .floating-panel {
-            position: absolute;
-            top: 80px;
-            right: 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.18);
-            width: 350px;
-            z-index: 1000;
+            z-index: 2000;
             display: none;
-            max-height: calc(78vh - 100px);
             overflow-y: auto;
-            border: 1px solid #e0e0e0;
+            padding: 15px;
+            transform: translateY(100%);
+            transition: transform 0.3s ease-out;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.2);
         }
         
         .floating-panel.active {
             display: block;
-            animation: slideIn 0.3s ease;
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateX(20px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            transform: translateY(0);
         }
         
         .panel {
             background: #f8f9fa;
             border-radius: 8px;
-            padding: 18px;
+            padding: 15px;
             border-left: 4px solid #2e7d32;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         
         .panel h2 {
             font-size: 18px;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             color: #2e7d32;
             display: flex;
             align-items: center;
@@ -187,7 +189,7 @@
         }
         
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
         
         label {
@@ -200,7 +202,7 @@
         
         input, select, textarea {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             border: 1px solid #ddd;
             border-radius: 6px;
             font-size: 14px;
@@ -215,17 +217,17 @@
         }
         
         textarea {
-            height: 100px;
+            height: 80px;
             resize: vertical;
         }
         
         .coordinates {
             background: #e8f5e9;
-            padding: 12px;
+            padding: 10px;
             border-radius: 6px;
             font-family: monospace;
-            margin: 10px 0;
-            font-size: 14px;
+            margin: 8px 0;
+            font-size: 13px;
             border-left: 3px solid #2e7d32;
         }
         
@@ -233,10 +235,10 @@
             background: #2e7d32;
             color: white;
             border: none;
-            padding: 13px 20px;
+            padding: 12px 15px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 500;
             transition: all 0.3s ease;
             width: 100%;
@@ -244,20 +246,20 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
         }
         
-        .btn:hover {
+        .btn:hover, .btn:active {
             background: #1b5e20;
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.18);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
         
         .btn-secondary {
             background: #5c6bc0;
         }
         
-        .btn-secondary:hover {
+        .btn-secondary:hover, .btn-secondary:active {
             background: #3f51b5;
         }
         
@@ -265,7 +267,7 @@
             background: #1565c0;
         }
         
-        .btn-print:hover {
+        .btn-print:hover, .btn-print:active {
             background: #0d47a1;
         }
         
@@ -273,7 +275,7 @@
             background: #ff9800;
         }
         
-        .btn-edit:hover {
+        .btn-edit:hover, .btn-edit:active {
             background: #f57c00;
         }
         
@@ -281,7 +283,7 @@
             background: #f44336;
         }
         
-        .btn-delete:hover {
+        .btn-delete:hover, .btn-delete:active {
             background: #d32f2f;
         }
         
@@ -289,7 +291,7 @@
             background: #9c27b0;
         }
         
-        .btn-csv:hover {
+        .btn-csv:hover, .btn-csv:active {
             background: #7b1fa2;
         }
         
@@ -297,20 +299,16 @@
             background: #4caf50;
         }
         
-        .btn-export:hover {
+        .btn-export:hover, .btn-export:active {
             background: #388e3c;
-        }
-        
-        .btn-info {
-            background: #00bcd4;
         }
         
         .data-item {
             background: white;
             border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 12px;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+            padding: 12px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
             border-left: 3px solid #4caf50;
             position: relative;
             transition: all 0.3s;
@@ -318,64 +316,70 @@
         
         .data-item:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
         
         .data-item h3 {
-            font-size: 16px;
+            font-size: 15px;
             color: #1b5e20;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
         }
         
         .data-item p {
-            font-size: 14px;
+            font-size: 13px;
             color: #555;
-            margin: 4px 0;
+            margin: 3px 0;
             line-height: 1.4;
         }
         
         .data-item .actions {
             display: flex;
-            gap: 8px;
-            margin-top: 12px;
+            gap: 6px;
+            margin-top: 10px;
+        }
+        
+        .data-item .actions .btn {
+            padding: 8px 10px;
+            font-size: 13px;
         }
         
         .legend {
             position: absolute;
-            bottom: 20px;
-            left: 20px;
+            top: 10px;
+            left: 10px;
             background: rgba(255, 255, 255, 0.95);
-            padding: 15px;
+            padding: 10px;
             border-radius: 8px;
             z-index: 1000;
-            box-shadow: 0 3px 15px rgba(0,0,0,0.18);
-            font-size: 14px;
-            max-width: 220px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            max-width: 160px;
             border: 1px solid #e0e0e0;
         }
         
         .legend-title {
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             color: #2e7d32;
             display: flex;
             align-items: center;
             gap: 5px;
+            font-size: 13px;
         }
         
         .legend-item {
             display: flex;
             align-items: center;
-            margin: 8px 0;
+            margin: 6px 0;
+            font-size: 12px;
         }
         
         .legend-color {
-            width: 20px;
-            height: 20px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
-            margin-right: 10px;
+            margin-right: 8px;
             flex-shrink: 0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
         
         .color-finca {
@@ -412,24 +416,22 @@
         }
         
         footer {
-            grid-column: 1 / -1;
             text-align: center;
-            padding: 20px;
+            padding: 15px;
             color: #666;
-            font-size: 14px;
-            margin-top: 20px;
+            font-size: 12px;
             display: flex;
             flex-direction: column;
             gap: 5px;
             background: #f8f9fa;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 5px rgba(0,0,0,0.08);
         }
         
         .search-container {
             display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 8px;
+            margin-bottom: 12px;
         }
         
         .search-container input {
@@ -438,7 +440,8 @@
         
         .search-container button {
             width: auto;
-            padding: 12px 16px;
+            padding: 10px 12px;
+            min-width: 50px;
         }
         
         .instructions-overlay {
@@ -448,7 +451,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.85);
-            z-index: 2000;
+            z-index: 3000;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -458,72 +461,89 @@
         .instructions-content {
             background: white;
             border-radius: 12px;
-            padding: 30px;
+            padding: 20px;
             width: 90%;
-            max-width: 700px;
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
         
         .instructions-content h2 {
             color: #2e7d32;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
             gap: 10px;
-            font-size: 24px;
+            font-size: 20px;
         }
         
         .instructions-content ul {
             padding-left: 20px;
-            margin: 20px 0;
+            margin: 15px 0;
         }
         
         .instructions-content li {
-            margin-bottom: 15px;
-            line-height: 1.6;
-            font-size: 16px;
+            margin-bottom: 12px;
+            line-height: 1.5;
+            font-size: 14px;
         }
         
         .close-btn {
             position: absolute;
-            top: 15px;
-            right: 15px;
+            top: 12px;
+            right: 12px;
             background: #f44336;
             color: white;
             border: none;
-            width: 40px;
-            height: 40px;
+            width: 35px;
+            height: 35px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 20px;
+            font-size: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.3s;
         }
         
-        .close-btn:hover {
+        .close-btn:hover, .close-btn:active {
             transform: rotate(90deg) scale(1.1);
         }
         
+        .close-panel-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #f44336;
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        
         .csv-upload-container {
-            margin: 15px 0;
-            padding: 15px;
+            margin: 12px 0;
+            padding: 12px;
             background: #f3e5f5;
             border-radius: 8px;
             border: 2px dashed #9c27b0;
         }
         
         .csv-table-container {
-            max-height: 300px;
+            max-height: 250px;
             overflow-y: auto;
-            margin-top: 15px;
+            margin-top: 12px;
             border: 1px solid #ddd;
             border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
         }
         
         .csv-table {
@@ -534,17 +554,18 @@
         .csv-table th {
             background: #7b1fa2;
             color: white;
-            padding: 12px 10px;
+            padding: 10px;
             text-align: left;
             position: sticky;
             top: 0;
             font-weight: 500;
+            font-size: 13px;
         }
         
         .csv-table td {
-            padding: 10px;
+            padding: 8px 10px;
             border-bottom: 1px solid #eee;
-            font-size: 14px;
+            font-size: 13px;
         }
         
         .csv-table tr:nth-child(even) {
@@ -557,7 +578,7 @@
         
         .tab-container {
             display: flex;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             border-bottom: 2px solid #2e7d32;
             background: #f8f9fa;
             border-radius: 6px;
@@ -565,16 +586,17 @@
         }
         
         .tab {
-            padding: 12px 15px;
+            padding: 10px 12px;
             cursor: pointer;
             background: #f8f9fa;
             font-weight: 500;
             flex: 1;
             text-align: center;
             transition: all 0.3s;
+            font-size: 13px;
         }
         
-        .tab:hover {
+        .tab:hover, .tab:active {
             background: #e8f5e9;
         }
         
@@ -600,12 +622,12 @@
         /* Control de capas personalizado */
         .leaflet-control-layers {
             position: absolute;
-            top: 80px;
-            right: 20px;
+            top: 70px;
+            right: 10px;
             z-index: 1000;
             background: white;
-            border-radius: 6px;
-            box-shadow: 0 3px 15px rgba(0,0,0,0.18);
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
             padding: 5px;
             border: 1px solid #e0e0e0;
         }
@@ -619,7 +641,7 @@
         }
         
         .leaflet-control-layers-expanded {
-            padding: 8px 12px;
+            padding: 5px 8px;
         }
         
         .leaflet-control-layers-base {
@@ -630,32 +652,34 @@
             display: flex;
             align-items: center;
             cursor: pointer;
-            padding: 5px 0;
+            padding: 3px 0;
+            font-size: 13px;
         }
         
         .leaflet-control-layers-base input {
-            margin-right: 8px;
+            margin-right: 6px;
         }
         
         /* Toast notifications */
         .toast {
             position: fixed;
-            bottom: 20px;
+            bottom: 15px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(0, 0, 0, 0.8);
             color: white;
-            padding: 15px 25px;
-            border-radius: 30px;
+            padding: 12px 20px;
+            border-radius: 25px;
             z-index: 3000;
-            font-size: 14px;
+            font-size: 13px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
             opacity: 0;
             transition: opacity 0.3s, transform 0.3s;
             pointer-events: none;
+            max-width: 90%;
         }
         
         .toast.show {
@@ -663,53 +687,34 @@
             transform: translateX(-50%) translateY(0);
         }
         
-        /* Clúster de marcadores personalizado */
-        .marker-cluster-custom {
-            background: rgba(233, 30, 99, 0.6);
-        }
-        
-        .marker-cluster-custom div {
-            background: rgba(233, 30, 99, 0.8);
-            color: white;
-        }
-        
-        .marker-cluster-csv {
-            background: rgba(156, 39, 176, 0.6);
-        }
-        
-        .marker-cluster-csv div {
-            background: rgba(156, 39, 176, 0.8);
-            color: white;
-        }
-        
         /* Estadísticas */
         .stats-container {
             display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 10px;
+            margin-bottom: 15px;
             flex-wrap: wrap;
         }
         
         .stat-card {
             flex: 1;
-            min-width: 150px;
+            min-width: 100px;
             background: white;
             border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+            padding: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
             text-align: center;
-            border-top: 4px solid #2e7d32;
+            border-top: 3px solid #2e7d32;
         }
         
         .stat-value {
-            font-size: 24px;
+            font-size: 18px;
             font-weight: 700;
             color: #2e7d32;
-            margin: 10px 0;
+            margin: 8px 0;
         }
         
         .stat-label {
-            font-size: 14px;
+            font-size: 12px;
             color: #666;
         }
         
@@ -729,35 +734,61 @@
             }
         }
         
-        @media (max-width: 900px) {
-            .floating-panel {
-                width: 90%;
-                left: 5%;
-                right: auto;
-            }
-            
+        @media (min-width: 768px) {
             .container {
-                grid-template-columns: 1fr;
+                max-width: 95%;
+                padding: 15px;
             }
             
-            .legend {
-                max-width: 180px;
-                font-size: 13px;
-                padding: 10px;
-                left: 10px;
-                bottom: 10px;
+            .map-container {
+                height: 75vh;
             }
             
-            .legend-item {
-                margin: 6px 0;
-            }
-            
-            .leaflet-control-layers {
-                top: 140px;
-            }
-            
-            .stats-container {
+            .floating-controls {
+                top: 15px;
+                right: 15px;
+                bottom: auto;
                 flex-direction: column;
+                max-width: 55px;
+            }
+            
+            .floating-panel {
+                position: absolute;
+                top: 80px;
+                right: 15px;
+                left: auto;
+                bottom: auto;
+                width: 320px;
+                max-height: calc(75vh - 100px);
+                border-radius: 12px;
+                transform: none;
+                box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            }
+            
+            .floating-panel.active {
+                transform: none;
+            }
+            
+            .close-panel-btn {
+                display: none;
+            }
+            
+            header {
+                padding: 15px 20px;
+            }
+            
+            .logo {
+                width: 60px;
+                height: 60px;
+                font-size: 11px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+            
+            .subtitle {
+                font-size: 14px;
             }
         }
     </style>
@@ -769,7 +800,7 @@
                 <div class="logo">FNC<br>&<br>CVC</div>
                 <div>
                     <h1>Geoportal - Seguridad Alimentaria</h1>
-                    <div class="subtitle">Convenio FNC y CVC | Departamento del Valle del Cauca, Colombia</div>
+                    <div class="subtitle">Convenio FNC y CVC | Valle del Cauca</div>
                 </div>
             </div>
             <div id="current-date">14 de Julio, 2025</div>
@@ -799,173 +830,169 @@
                 </button>
             </div>
             
-            <!-- Panel flotante para formulario -->
-            <div id="form-panel" class="floating-panel">
-                <div class="panel">
-                    <h2><i class="fas fa-map-marker-alt"></i> Captura de Datos</h2>
-                    <div class="coordinates" id="coordinates">Haga clic en el mapa para capturar coordenadas</div>
-                    
-                    <div class="form-group">
-                        <label for="beneficiary">Nombre del Beneficiario *</label>
-                        <input type="text" id="beneficiary" placeholder="Ingrese el nombre completo">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="farm">Nombre de la Finca *</label>
-                        <input type="text" id="farm" placeholder="Ingrese el nombre de la finca">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="crop">Cultivo Principal *</label>
-                        <select id="crop">
-                            <option value="">Seleccione un cultivo</option>
-                            <option value="cafe">Café</option>
-                            <option value="platano">Plátano</option>
-                            <option value="maiz">Maíz</option>
-                            <option value="frijol">Frijol</option>
-                            <option value="hortalizas">Hortalizas</option>
-                            <option value="frutales">Frutales</option>
-                            <option value="cacao">Cacao</option>
-                            <option value="ganaderia">Ganadería</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="observations">Observaciones</label>
-                        <textarea id="observations" placeholder="Ingrese observaciones adicionales"></textarea>
-                    </div>
-                    
-                    <button id="save-btn" class="btn">
-                        <i class="fas fa-save"></i> Guardar Datos
-                    </button>
-                    <button id="cancel-edit-btn" class="btn btn-delete" style="display: none; margin-top: 10px;">
-                        <i class="fas fa-times"></i> Cancelar Edición
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Panel flotante para datos -->
-            <div id="data-panel" class="floating-panel">
-                <div class="panel">
-                    <h2><i class="fas fa-search"></i> Consultar Datos</h2>
-                    
-                    <div class="stats-container">
-                        <div class="stat-card">
-                            <div class="stat-value" id="total-farms">0</div>
-                            <div class="stat-label">Fincas Registradas</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="total-beneficiaries">0</div>
-                            <div class="stat-label">Beneficiarios</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="last-update">Hoy</div>
-                            <div class="stat-label">Última Actualización</div>
-                        </div>
-                    </div>
-                    
-                    <div class="search-container">
-                        <input type="text" id="search-input" placeholder="Buscar por nombre, finca o cultivo...">
-                        <button id="search-btn" class="btn btn-secondary">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                    
-                    <div id="data-list">
-                        <!-- Los datos guardados aparecerán aquí -->
-                    </div>
-                    
-                    <div class="form-group" style="margin-top: 20px;">
-                        <button id="export-btn" class="btn btn-export">
-                            <i class="fas fa-file-export"></i> Exportar a CSV
-                        </button>
-                        <button id="clear-all-btn" class="btn btn-delete" style="margin-top: 10px;">
-                            <i class="fas fa-trash"></i> Eliminar Todos los Datos
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Panel flotante para CSV -->
-            <div id="csv-panel" class="floating-panel">
-                <div class="panel">
-                    <h2><i class="fas fa-file-csv"></i> Cargar Datos CSV</h2>
-                    
-                    <div class="csv-upload-container">
-                        <div class="form-group">
-                            <label for="csv-file">Seleccionar archivo CSV</label>
-                            <input type="file" id="csv-file" accept=".csv">
-                        </div>
-                        
-                        <div class="form-group">
-                            <button id="load-csv-btn" class="btn btn-csv">
-                                <i class="fas fa-upload"></i> Cargar Datos
-                            </button>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Estructura CSV esperada:</label>
-                            <div class="coordinates">
-                                Beneficiario,Finca,Cultivo,Latitud,Longitud
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="tab-container">
-                        <div class="tab active" data-tab="csv-data">Datos CSV</div>
-                        <div class="tab" data-tab="map-view">Visualización</div>
-                    </div>
-                    
-                    <div class="tab-content active" id="csv-data">
-                        <div id="csv-table-container" class="csv-table-container">
-                            <!-- Tabla de datos CSV aparecerá aquí -->
-                        </div>
-                    </div>
-                    
-                    <div class="tab-content" id="map-view">
-                        <div class="form-group">
-                            <label>Datos cargados: <span id="csv-count">0</span> registros</label>
-                        </div>
-                        
-                        <div class="form-group">
-                            <button id="plot-csv-btn" class="btn btn-csv">
-                                <i class="fas fa-map-marker-alt"></i> Mostrar en Mapa
-                            </button>
-                            <button id="clear-csv-btn" class="btn btn-delete" style="margin-top: 10px;">
-                                <i class="fas fa-trash"></i> Limpiar Datos CSV
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
             <div class="legend">
                 <div class="legend-title">
                     <i class="fas fa-map-pin"></i> Leyenda
                 </div>
                 <div class="legend-item">
                     <div class="legend-color color-finca"></div>
-                    <span>Fincas Registradas</span>
+                    <span>Fincas</span>
                 </div>
                 <div class="legend-item">
                     <div class="legend-color color-csv"></div>
                     <span>Datos CSV</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-color color-beneficiario"></div>
-                    <span>Beneficiarios</span>
-                </div>
-                <div class="legend-item">
                     <div class="legend-color color-ubicacion"></div>
                     <span>Su Ubicación</span>
                 </div>
-                <div class="legend-item">
-                    <div class="legend-color color-edit"></div>
-                    <span>Edición</span>
+            </div>
+        </div>
+        
+        <!-- Panel flotante para formulario -->
+        <div id="form-panel" class="floating-panel">
+            <button class="close-panel-btn">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="panel">
+                <h2><i class="fas fa-map-marker-alt"></i> Captura de Datos</h2>
+                <div class="coordinates" id="coordinates">Haga clic en el mapa para capturar coordenadas</div>
+                
+                <div class="form-group">
+                    <label for="beneficiary">Nombre del Beneficiario *</label>
+                    <input type="text" id="beneficiary" placeholder="Ingrese el nombre completo">
                 </div>
-                <div class="legend-item">
-                    <div class="legend-color color-new"></div>
-                    <span>Nuevo Registro</span>
+                
+                <div class="form-group">
+                    <label for="farm">Nombre de la Finca *</label>
+                    <input type="text" id="farm" placeholder="Ingrese el nombre de la finca">
+                </div>
+                
+                <div class="form-group">
+                    <label for="crop">Cultivo Principal *</label>
+                    <select id="crop">
+                        <option value="">Seleccione un cultivo</option>
+                        <option value="cafe">Café</option>
+                        <option value="platano">Plátano</option>
+                        <option value="maiz">Maíz</option>
+                        <option value="frijol">Frijol</option>
+                        <option value="hortalizas">Hortalizas</option>
+                        <option value="frutales">Frutales</option>
+                        <option value="cacao">Cacao</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="observations">Observaciones</label>
+                    <textarea id="observations" placeholder="Ingrese observaciones adicionales"></textarea>
+                </div>
+                
+                <button id="save-btn" class="btn">
+                    <i class="fas fa-save"></i> Guardar Datos
+                </button>
+                <button id="cancel-edit-btn" class="btn btn-delete" style="display: none; margin-top: 10px;">
+                    <i class="fas fa-times"></i> Cancelar Edición
+                </button>
+            </div>
+        </div>
+        
+        <!-- Panel flotante para datos -->
+        <div id="data-panel" class="floating-panel">
+            <button class="close-panel-btn">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="panel">
+                <h2><i class="fas fa-search"></i> Consultar Datos</h2>
+                
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-farms">0</div>
+                        <div class="stat-label">Fincas</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-beneficiaries">0</div>
+                        <div class="stat-label">Beneficiarios</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="last-update">Hoy</div>
+                        <div class="stat-label">Última Actualización</div>
+                    </div>
+                </div>
+                
+                <div class="search-container">
+                    <input type="text" id="search-input" placeholder="Buscar por nombre o finca...">
+                    <button id="search-btn" class="btn btn-secondary">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                
+                <div id="data-list">
+                    <!-- Los datos guardados aparecerán aquí -->
+                </div>
+                
+                <div class="form-group" style="margin-top: 15px;">
+                    <button id="export-btn" class="btn btn-export">
+                        <i class="fas fa-file-export"></i> Exportar a CSV
+                    </button>
+                    <button id="clear-all-btn" class="btn btn-delete" style="margin-top: 10px;">
+                        <i class="fas fa-trash"></i> Eliminar Todos
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Panel flotante para CSV -->
+        <div id="csv-panel" class="floating-panel">
+            <button class="close-panel-btn">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="panel">
+                <h2><i class="fas fa-file-csv"></i> Cargar Datos CSV</h2>
+                
+                <div class="csv-upload-container">
+                    <div class="form-group">
+                        <label for="csv-file">Seleccionar archivo CSV</label>
+                        <input type="file" id="csv-file" accept=".csv">
+                    </div>
+                    
+                    <div class="form-group">
+                        <button id="load-csv-btn" class="btn btn-csv">
+                            <i class="fas fa-upload"></i> Cargar Datos
+                        </button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Estructura CSV esperada:</label>
+                        <div class="coordinates">
+                            Beneficiario,Finca,Cultivo,Latitud,Longitud
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-container">
+                    <div class="tab active" data-tab="csv-data">Datos CSV</div>
+                    <div class="tab" data-tab="map-view">Visualización</div>
+                </div>
+                
+                <div class="tab-content active" id="csv-data">
+                    <div id="csv-table-container" class="csv-table-container">
+                        <!-- Tabla de datos CSV aparecerá aquí -->
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="map-view">
+                    <div class="form-group">
+                        <label>Datos cargados: <span id="csv-count">0</span> registros</label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button id="plot-csv-btn" class="btn btn-csv">
+                            <i class="fas fa-map-marker-alt"></i> Mostrar en Mapa
+                        </button>
+                        <button id="clear-csv-btn" class="btn btn-delete" style="margin-top: 10px;">
+                            <i class="fas fa-trash"></i> Limpiar Datos
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -979,21 +1006,17 @@
                 <ul>
                     <li><strong>Captura de datos:</strong> Haga clic en el botón <i class="fas fa-edit"></i> para mostrar el formulario. Luego haga clic en cualquier punto del mapa para capturar las coordenadas y complete los campos requeridos.</li>
                     <li><strong>Consulta de datos:</strong> Haga clic en el botón <i class="fas fa-database"></i> para ver todos los registros guardados. Puede buscar registros específicos utilizando el campo de búsqueda.</li>
-                    <li><strong>Edición de datos:</strong> En la lista de registros, haga clic en el botón "Editar" para modificar cualquier información antes de imprimir.</li>
-                    <li><strong>Exportación de datos:</strong> Use el botón "Exportar a CSV" para descargar todos los datos registrados en formato CSV.</li>
                     <li><strong>Carga de CSV:</strong> Use el botón <i class="fas fa-file-csv"></i> para cargar datos desde archivos CSV.</li>
-                    <li><strong>Visualización CSV:</strong> Los datos CSV se pueden visualizar en tabla y también como marcadores en el mapa.</li>
                     <li><strong>Ubicación:</strong> Use el botón <i class="fas fa-location-crosshairs"></i> para centrar el mapa en su posición actual.</li>
                     <li><strong>Impresión:</strong> Genere reportes imprimibles con el botón <i class="fas fa-print"></i>.</li>
-                    <li><strong>Estadísticas:</strong> En el panel de datos, encontrará estadísticas sobre las fincas registradas y beneficiarios.</li>
                 </ul>
                 <p><strong>Nota:</strong> Los campos marcados con * son obligatorios para guardar un registro.</p>
-                <div style="margin-top: 20px; background: #e8f5e9; padding: 15px; border-radius: 8px;">
-                    <h3><i class="fas fa-lightbulb"></i> Consejos Rápidos</h3>
+                <div style="margin-top: 15px; background: #e8f5e9; padding: 12px; border-radius: 8px;">
+                    <h3><i class="fas fa-lightbulb"></i> Consejos para Móviles</h3>
                     <ul>
-                        <li>Utilice la rueda del mouse para hacer zoom en el mapa</li>
-                        <li>Puede arrastrar el mapa para desplazarse</li>
-                        <li>Haga clic en un marcador para ver la información detallada</li>
+                        <li>Toque con dos dedos y deslice para hacer zoom</li>
+                        <li>Deslice con un dedo para desplazar el mapa</li>
+                        <li>Toque un marcador para ver información detallada</li>
                         <li>Los datos se guardan automáticamente en su dispositivo</li>
                     </ul>
                 </div>
@@ -1006,8 +1029,8 @@
         </div>
         
         <footer>
-            <p>Sistema Geoportal para Seguridad Alimentaria - Convenio FNC y CVC | Departamento del Valle del Cauca, Colombia</p>
-            <p>Datos almacenados localmente en este dispositivo | Elaborado por Diego Castaño Esp. en SIG | © 2025</p>
+            <p>Sistema Geoportal para Seguridad Alimentaria - FNC y CVC</p>
+            <p>Datos almacenados localmente | © 2025</p>
         </footer>
     </div>
     
@@ -1093,7 +1116,7 @@
         // Función para exportar datos a CSV
         function exportToCSV() {
             if (farmData.length === 0) {
-                showToast('No hay datos registrados para exportar.', 4000);
+                showToast('No hay datos para exportar', 4000);
                 return;
             }
             
@@ -1116,13 +1139,13 @@
             link.click();
             document.body.removeChild(link);
             
-            showToast('Datos exportados a CSV correctamente');
+            showToast('Datos exportados a CSV');
         }
         
         // Función para guardar datos
         function saveData() {
             if (!currentCoords) {
-                showToast('Por favor, seleccione una ubicación en el mapa primero.', 4000);
+                showToast('Seleccione ubicación primero', 4000);
                 return;
             }
             
@@ -1132,7 +1155,7 @@
             const observations = document.getElementById('observations').value;
             
             if (!beneficiary || !farm || !crop) {
-                showToast('Por favor, complete todos los campos obligatorios (*).', 4000);
+                showToast('Complete campos obligatorios', 4000);
                 return;
             }
             
@@ -1155,11 +1178,11 @@
                 }
                 // Salir del modo edición
                 cancelEdit();
-                showToast('Registro actualizado correctamente');
+                showToast('Registro actualizado');
             } else {
                 // Nuevo registro
                 farmData.push(data);
-                showToast('Datos guardados correctamente');
+                showToast('Datos guardados');
             }
             
             // Guardar en localStorage
@@ -1189,8 +1212,7 @@
                 'frijol': 'Frijol',
                 'hortalizas': 'Hortalizas',
                 'frutales': 'Frutales',
-                'cacao': 'Cacao',
-                'ganaderia': 'Ganadería'
+                'cacao': 'Cacao'
             };
             return crops[cropKey] || cropKey;
         }
@@ -1217,10 +1239,10 @@
                 const marker = L.marker(data.coords, {
                     icon: L.divIcon({
                         className: 'farm-marker',
-                        html: `<div style="background-color:${editingId === data.id ? '#ffc107' : '#e91e63'}; width:24px; height:24px; border-radius:50%; border:2px solid white; box-shadow:0 0 10px rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center;">
-                                <i class="fas fa-tractor" style="color:white; font-size:12px;"></i>
+                        html: `<div style="background-color:${editingId === data.id ? '#ffc107' : '#e91e63'}; width:22px; height:22px; border-radius:50%; border:2px solid white; box-shadow:0 0 8px rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center;">
+                                <i class="fas fa-tractor" style="color:white; font-size:10px;"></i>
                            </div>`,
-                        iconSize: [28, 28]
+                        iconSize: [26, 26]
                     })
                 });
                 
@@ -1242,8 +1264,7 @@
             
             const filteredData = farmData.filter(data => 
                 data.beneficiary.toLowerCase().includes(filter.toLowerCase()) || 
-                data.farm.toLowerCase().includes(filter.toLowerCase()) ||
-                getCropName(data.crop).toLowerCase().includes(filter.toLowerCase())
+                data.farm.toLowerCase().includes(filter.toLowerCase())
             );
             
             if (filteredData.length === 0) {
@@ -1317,8 +1338,8 @@
             const marker = L.marker(currentCoords, {
                 icon: L.divIcon({
                     className: 'temp-marker',
-                    html: '<div style="background-color:#ffc107; width:24px; height:24px; border-radius:50%; border:2px solid white; box-shadow:0 0 10px rgba(0,0,0,0.5);"></div>',
-                    iconSize: [28, 28]
+                    html: '<div style="background-color:#ffc107; width:22px; height:22px; border-radius:50%; border:2px solid white; box-shadow:0 0 8px rgba(0,0,0,0.5);"></div>',
+                    iconSize: [26, 26]
                 })
             }).addTo(map);
             
@@ -1354,7 +1375,7 @@
         
         // Función para eliminar datos
         function deleteData(id) {
-            if (!confirm('¿Está seguro de que desea eliminar este registro?')) return;
+            if (!confirm('¿Eliminar este registro?')) return;
             
             farmData = farmData.filter(item => item.id !== id);
             localStorage.setItem('farmData', JSON.stringify(farmData));
@@ -1363,12 +1384,12 @@
             updateDataList();
             updateStats();
             
-            showToast('Registro eliminado correctamente');
+            showToast('Registro eliminado');
         }
         
         // Función para eliminar todos los datos
         function deleteAllData() {
-            if (!confirm('¿Está seguro de que desea eliminar TODOS los registros? Esta acción no se puede deshacer.')) return;
+            if (!confirm('¿Eliminar TODOS los registros? Esta acción no se puede deshacer.')) return;
             
             farmData = [];
             localStorage.removeItem('farmData');
@@ -1377,7 +1398,7 @@
             updateDataList();
             updateStats();
             
-            showToast('Todos los registros han sido eliminados');
+            showToast('Todos los registros eliminados');
         }
         
         // Función para limpiar marcadores temporales
@@ -1433,7 +1454,7 @@
             const file = fileInput.files[0];
             
             if (!file) {
-                showToast('Por favor, seleccione un archivo CSV.', 4000);
+                showToast('Seleccione archivo CSV', 4000);
                 return;
             }
             
@@ -1442,7 +1463,7 @@
                 skipEmptyLines: true,
                 complete: function(results) {
                     if (results.errors.length > 0) {
-                        showToast('Se encontraron errores en el archivo CSV: ' + results.errors[0].message, 5000);
+                        showToast('Error en CSV: ' + results.errors[0].message, 5000);
                         return;
                     }
                     
@@ -1451,7 +1472,7 @@
                     const firstRow = results.data[0];
                     
                     if (!firstRow) {
-                        showToast('El archivo CSV está vacío o no tiene datos válidos.', 4000);
+                        showToast('CSV vacío', 4000);
                         return;
                     }
                     
@@ -1460,7 +1481,7 @@
                     );
                     
                     if (!hasValidFields) {
-                        showToast('La estructura del CSV no es válida. Se requieren campos: Beneficiario, Finca, Cultivo, Latitud, Longitud', 5000);
+                        showToast('Estructura CSV inválida', 5000);
                         return;
                     }
                     
@@ -1483,7 +1504,7 @@
                     );
                     
                     if (csvData.length === 0) {
-                        showToast('No se encontraron datos válidos en el archivo CSV.', 4000);
+                        showToast('No hay datos válidos', 4000);
                         return;
                     }
                     
@@ -1494,7 +1515,7 @@
                     updateCSVTableView();
                     document.getElementById('csv-count').textContent = csvData.length;
                     
-                    showToast(`Se cargaron ${csvData.length} registros desde el archivo CSV.`);
+                    showToast(`${csvData.length} registros cargados`);
                 }
             });
         }
@@ -1547,7 +1568,7 @@
             csvCluster.clearLayers();
             
             if (csvData.length === 0) {
-                showToast('No hay datos CSV cargados para mostrar en el mapa.', 4000);
+                showToast('No hay datos CSV', 4000);
                 return;
             }
             
@@ -1557,10 +1578,10 @@
                 const marker = L.marker(coords, {
                     icon: L.divIcon({
                         className: 'csv-marker',
-                        html: `<div style="background-color:#9c27b0; width:22px; height:22px; border-radius:50%; border:2px solid white; box-shadow:0 0 10px rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center;">
-                                <i class="fas fa-file-csv" style="color:white; font-size:10px;"></i>
+                        html: `<div style="background-color:#9c27b0; width:20px; height:20px; border-radius:50%; border:2px solid white; box-shadow:0 0 8px rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center;">
+                                <i class="fas fa-file-csv" style="color:white; font-size:9px;"></i>
                            </div>`,
-                        iconSize: [26, 26]
+                        iconSize: [24, 24]
                     })
                 });
                 
@@ -1577,12 +1598,12 @@
             const bounds = L.latLngBounds(csvData.map(row => [row.latitud, row.longitud]));
             map.fitBounds(bounds, { padding: [50, 50] });
             
-            showToast('Datos CSV mostrados en el mapa');
+            showToast('Datos CSV en mapa');
         }
         
         // Limpiar datos CSV
         function clearCSVData() {
-            if (!confirm('¿Está seguro de que desea eliminar todos los datos CSV cargados?')) return;
+            if (!confirm('¿Eliminar datos CSV?')) return;
             
             csvData = [];
             localStorage.removeItem('csvData');
@@ -1623,8 +1644,8 @@
                 const marker = L.marker(currentCoords, {
                     icon: L.divIcon({
                         className: 'temp-marker',
-                        html: '<div style="background-color:#4caf50; width:24px; height:24px; border-radius:50%; border:2px solid white; box-shadow:0 0 10px rgba(0,0,0,0.5);"></div>',
-                        iconSize: [28, 28]
+                        html: '<div style="background-color:#4caf50; width:22px; height:22px; border-radius:50%; border:2px solid white; box-shadow:0 0 8px rgba(0,0,0,0.5);"></div>',
+                        iconSize: [26, 26]
                     })
                 }).addTo(map);
                 
@@ -1664,6 +1685,11 @@
             
             document.getElementById('close-instructions').addEventListener('click', function() {
                 document.getElementById('instructions-overlay').style.display = 'none';
+            });
+            
+            // Botones de cerrar panel
+            document.querySelectorAll('.close-panel-btn').forEach(btn => {
+                btn.addEventListener('click', closePanels);
             });
             
             document.getElementById('save-btn').addEventListener('click', saveData);
@@ -1732,8 +1758,8 @@
                         userMarker = L.marker(userLocation, {
                             icon: L.divIcon({
                                 className: 'user-marker',
-                                html: '<div style="background-color:#ff9800; width:24px; height:24px; border-radius:50%; border:2px solid white; box-shadow:0 0 10px rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center;"><i class="fas fa-user" style="color:white; font-size:12px;"></i></div>',
-                                iconSize: [28, 28]
+                                html: '<div style="background-color:#ff9800; width:22px; height:22px; border-radius:50%; border:2px solid white; box-shadow:0 0 8px rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center;"><i class="fas fa-user" style="color:white; font-size:10px;"></i></div>',
+                                iconSize: [26, 26]
                             })
                         }).addTo(map);
                         
@@ -1742,11 +1768,11 @@
                         showToast('Ubicación encontrada');
                     },
                     error => {
-                        showToast('No se pudo obtener su ubicación: ' + error.message, 4000);
+                        showToast('Error: ' + error.message, 4000);
                     }
                 );
             } else {
-                showToast('La geolocalización no es soportada por su navegador.', 4000);
+                showToast('Geolocalización no soportada', 4000);
             }
         }
         
@@ -1781,7 +1807,7 @@
                 const title = document.createElement('h1');
                 title.textContent = 'Reporte de Visitas a Fincas';
                 title.style.textAlign = 'center';
-                title.style.marginBottom: '20px';
+                title.style.marginBottom = '20px';
                 title.style.color = '#2e7d32';
                 printContent.appendChild(title);
                 
@@ -1789,7 +1815,7 @@
                 const subtitle = document.createElement('h2');
                 subtitle.textContent = 'Convenio FNC y CVC - Seguridad Alimentaria';
                 subtitle.style.textAlign = 'center';
-                subtitle.style.marginBottom: '30px';
+                subtitle.style.marginBottom = '30px';
                 subtitle.style.color = '#555';
                 subtitle.style.fontSize = '18px';
                 printContent.appendChild(subtitle);
@@ -1798,51 +1824,10 @@
                 const mapImg = document.createElement('img');
                 mapImg.src = canvas.toDataURL('image/png');
                 mapImg.style.width = '100%';
-                mapImg.style.height = '400px';
+                mapImg.style.height = '300px';
                 mapImg.style.border = '1px solid #ddd';
                 mapImg.style.marginBottom = '20px';
                 printContent.appendChild(mapImg);
-                
-                // Estadísticas
-                const statsContainer = document.createElement('div');
-                statsContainer.style.display = 'flex';
-                statsContainer.style.justifyContent = 'space-between';
-                statsContainer.style.marginBottom = '20px';
-                
-                const uniqueBeneficiaries = new Set(farmData.map(data => data.beneficiary));
-                
-                const stats = [
-                    { label: 'Total Fincas', value: farmData.length },
-                    { label: 'Beneficiarios', value: uniqueBeneficiaries.size },
-                    { label: 'Última Actualización', value: new Date().toLocaleDateString('es-CO') }
-                ];
-                
-                stats.forEach(stat => {
-                    const statDiv = document.createElement('div');
-                    statDiv.style.textAlign = 'center';
-                    statDiv.style.padding = '10px';
-                    statDiv.style.border = '1px solid #ddd';
-                    statDiv.style.borderRadius = '8px';
-                    statDiv.style.flex = '1';
-                    statDiv.style.margin = '0 5px';
-                    
-                    const statValue = document.createElement('div');
-                    statValue.textContent = stat.value;
-                    statValue.style.fontSize = '20px';
-                    statValue.style.fontWeight = 'bold';
-                    statValue.style.color = '#2e7d32';
-                    
-                    const statLabel = document.createElement('div');
-                    statLabel.textContent = stat.label;
-                    statLabel.style.fontSize = '14px';
-                    statLabel.style.color = '#666';
-                    
-                    statDiv.appendChild(statValue);
-                    statDiv.appendChild(statLabel);
-                    statsContainer.appendChild(statDiv);
-                });
-                
-                printContent.appendChild(statsContainer);
                 
                 // Tabla de datos
                 const table = document.createElement('table');
@@ -1855,11 +1840,11 @@
                 const thead = document.createElement('thead');
                 thead.innerHTML = `
                     <tr style="background-color: #2e7d32; color: white;">
-                        <th style="padding: 12px; text-align: left;">Finca</th>
-                        <th style="padding: 12px; text-align: left;">Beneficiario</th>
-                        <th style="padding: 12px; text-align: left;">Cultivo</th>
-                        <th style="padding: 12px; text-align: left;">Ubicación</th>
-                        <th style="padding: 12px; text-align: left;">Fecha</th>
+                        <th style="padding: 10px; text-align: left;">Finca</th>
+                        <th style="padding: 10px; text-align: left;">Beneficiario</th>
+                        <th style="padding: 10px; text-align: left;">Cultivo</th>
+                        <th style="padding: 10px; text-align: left;">Ubicación</th>
+                        <th style="padding: 10px; text-align: left;">Fecha</th>
                     </tr>
                 `;
                 table.appendChild(thead);
@@ -1870,11 +1855,11 @@
                     const row = document.createElement('tr');
                     row.style.borderBottom = '1px solid #ddd';
                     row.innerHTML = `
-                        <td style="padding: 10px;">${data.farm}</td>
-                        <td style="padding: 10px;">${data.beneficiary}</td>
-                        <td style="padding: 10px;">${getCropName(data.crop)}</td>
-                        <td style="padding: 10px;">${data.coords.lat.toFixed(6)}, ${data.coords.lng.toFixed(6)}</td>
-                        <td style="padding: 10px;">${data.date}</td>
+                        <td style="padding: 8px;">${data.farm}</td>
+                        <td style="padding: 8px;">${data.beneficiary}</td>
+                        <td style="padding: 8px;">${getCropName(data.crop)}</td>
+                        <td style="padding: 8px;">${data.coords.lat.toFixed(6)}, ${data.coords.lng.toFixed(6)}</td>
+                        <td style="padding: 8px;">${data.date}</td>
                     `;
                     tbody.appendChild(row);
                 });
@@ -1886,6 +1871,7 @@
                 footer.style.marginTop = '30px';
                 footer.style.display = 'flex';
                 footer.style.justifyContent = 'space-between';
+                footer.style.fontSize = '14px';
                 
                 const date = document.createElement('div');
                 date.innerHTML = `<strong>Fecha de generación:</strong> ${new Date().toLocaleDateString('es-CO')}`;
