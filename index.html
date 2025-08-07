@@ -819,6 +819,124 @@
             font-size: 10px;
             z-index: 1000;
         }
+        
+        /* Estilos para la ventana de impresión */
+        .print-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 4000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            display: none;
+        }
+        
+        .print-content {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .print-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #2e7d32;
+        }
+        
+        .print-map-container {
+            height: 400px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        #print-map {
+            height: 100%;
+            width: 100%;
+        }
+        
+        .print-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #2e7d32;
+            margin-bottom: 15px;
+        }
+        
+        .print-info h3 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+        
+        .print-info p {
+            margin: 5px 0;
+        }
+        
+        .print-controls {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .print-close-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: #f44336;
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .print-map-info-overlay {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 8px;
+            z-index: 1000;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            max-width: 300px;
+        }
+        
+        .print-map-info-overlay h3 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .print-map-credits {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
@@ -1071,6 +1189,57 @@
     <!-- Contenedor oculto para impresión -->
     <div id="print-container" class="print-container"></div>
 
+    <!-- Ventana de impresión de mapas -->
+    <div class="print-overlay" id="print-overlay">
+        <div class="print-content">
+            <button class="print-close-btn" id="print-close-btn">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="print-header">
+                <div>
+                    <h2>Mapa del Beneficiario</h2>
+                    <p>Radio de 500 metros alrededor de la ubicación</p>
+                </div>
+                <div class="logo-container">
+                    <div class="logo">FNC<br>&<br>CVC</div>
+                    <div>
+                        <div class="subtitle">Geoportal - Seguridad Alimentaria</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="print-map-container">
+                <div id="print-map"></div>
+                <div class="print-map-info-overlay" id="print-map-info-overlay">
+                    <h3 id="print-farm-name">Nombre de la Finca</h3>
+                    <p><strong>Beneficiario:</strong> <span id="print-beneficiary">Nombre del Beneficiario</span></p>
+                    <p><strong>Cultivo:</strong> <span id="print-crop">Cultivo Principal</span></p>
+                    <p><strong>Ubicación:</strong> <span id="print-coords">Lat: 0.000000, Lng: 0.000000</span></p>
+                    <p><strong>Altura:</strong> <span id="print-elevation">--</span> m</p>
+                    <p><strong>Fecha:</strong> <span id="print-date">Fecha de registro</span></p>
+                </div>
+                <div class="print-map-credits">© Leaflet | OpenStreetMap | Esri</div>
+            </div>
+            
+            <div class="print-info">
+                <h3>Información Adicional</h3>
+                <p><strong>Observaciones:</strong> <span id="print-observations">Ninguna</span></p>
+                <p><strong>Radio:</strong> 500 metros alrededor de la ubicación</p>
+                <p><strong>Fecha de impresión:</strong> <span id="print-current-date">Fecha actual</span></p>
+            </div>
+            
+            <div class="print-controls">
+                <button id="print-map-btn" class="btn btn-print">
+                    <i class="fas fa-print"></i> Imprimir Mapa
+                </button>
+                <button id="close-print-btn" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Inicializar mapa
         const map = L.map('map').setView([3.4516, -76.5320], 10); // Centro en Valle del Cauca
@@ -1101,6 +1270,7 @@
         let userMarker = null;
         let editingId = null;
         let csvData = JSON.parse(localStorage.getItem('csvData')) || [];
+        let printMapInstance = null;
         
         // Grupos de clústeres para evitar superposición
         const farmCluster = L.markerClusterGroup({
@@ -1276,7 +1446,12 @@
                     Beneficiario: ${data.beneficiary}<br>
                     Cultivo: ${getCropName(data.crop)}<br>
                     Altura: ${data.elevation} m<br>
-                    Fecha: ${data.date}
+                    Fecha: ${data.date}<br>
+                    <div style="margin-top:8px; text-align:center;">
+                        <button class="btn-popup-print" data-id="${data.id}" style="background:#1565c0; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer;">
+                            <i class="fas fa-print"></i> Imprimir
+                        </button>
+                    </div>
                 `);
                 
                 // Evento para editar al hacer clic en el marcador
@@ -1320,6 +1495,9 @@
                         <button class="btn btn-delete delete-btn" data-id="${data.id}">
                             <i class="fas fa-trash"></i> Eliminar
                         </button>
+                        <button class="btn btn-print print-btn" data-id="${data.id}">
+                            <i class="fas fa-print"></i> Imprimir
+                        </button>
                     </div>
                 `;
                 dataList.appendChild(item);
@@ -1337,6 +1515,17 @@
                 btn.addEventListener('click', function() {
                     const id = parseInt(this.getAttribute('data-id'));
                     deleteData(id);
+                });
+            });
+            
+            // Agregar event listeners a los botones de impresión
+            document.querySelectorAll('.print-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = parseInt(this.getAttribute('data-id'));
+                    const data = farmData.find(d => d.id === id);
+                    if (data) {
+                        showPrintView(data);
+                    }
                 });
             });
         }
@@ -1484,6 +1673,110 @@
             document.getElementById('csv-btn').classList.remove('active');
         }
         
+        // Función para mostrar la ventana de impresión
+        function showPrintView(data) {
+            // Actualizar la información en la ventana de impresión
+            document.getElementById('print-farm-name').textContent = data.farm;
+            document.getElementById('print-beneficiary').textContent = data.beneficiary;
+            document.getElementById('print-crop').textContent = getCropName(data.crop);
+            document.getElementById('print-coords').textContent = 
+                `Lat: ${data.coords.lat.toFixed(6)}, Lng: ${data.coords.lng.toFixed(6)}`;
+            document.getElementById('print-elevation').textContent = data.elevation;
+            document.getElementById('print-date').textContent = data.date;
+            document.getElementById('print-observations').textContent = data.observations || 'Ninguna';
+            document.getElementById('print-current-date').textContent = new Date().toLocaleDateString('es-CO', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            // Inicializar mapa de impresión
+            initPrintMap(data);
+            
+            // Mostrar la ventana de impresión
+            document.getElementById('print-overlay').style.display = 'flex';
+        }
+        
+        // Función para inicializar el mapa de impresión
+        function initPrintMap(data) {
+            // Eliminar mapa existente si hay uno
+            if (printMapInstance) {
+                printMapInstance.remove();
+            }
+            
+            // Crear nuevo mapa
+            printMapInstance = L.map('print-map').setView(data.coords, 16);
+            
+            // Añadir capa base (usar la misma que el mapa principal)
+            const currentBaseLayer = map.getLayers()[0];
+            let baseLayer;
+            
+            if (currentBaseLayer instanceof L.TileLayer) {
+                baseLayer = L.tileLayer(currentBaseLayer._url, currentBaseLayer.options);
+            } else {
+                // Por defecto, si no se puede determinar, usar Esri Satelital
+                baseLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics'
+                });
+            }
+            
+            baseLayer.addTo(printMapInstance);
+            
+            // Añadir círculo de 500 metros
+            L.circle(data.coords, {
+                radius: 500,
+                color: '#3388ff',
+                fillColor: '#3388ff',
+                fillOpacity: 0.2,
+                weight: 2
+            }).addTo(printMapInstance);
+            
+            // Añadir marcador en la ubicación
+            L.marker(data.coords, {
+                icon: L.divIcon({
+                    className: 'print-marker',
+                    html: '<div style="background-color:#e91e63; width:26px; height:26px; border-radius:50%; border:2px solid white; box-shadow:0 0 10px rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center;"><i class="fas fa-map-marker-alt" style="color:white; font-size:14px;"></i></div>',
+                    iconSize: [30, 30]
+                })
+            }).addTo(printMapInstance);
+            
+            // Añadir etiqueta del radio
+            L.marker(data.coords, {
+                icon: L.divIcon({
+                    className: 'radius-label',
+                    html: `<div style="background:rgba(255,255,255,0.85); padding:4px 8px; border-radius:4px; font-size:12px; border-left:3px solid #3388ff;">Radio: 500m</div>`,
+                    iconSize: [0, 0] // Tamaño cero para usar solo el HTML
+                })
+            }).addTo(printMapInstance);
+        }
+        
+        // Función para imprimir el mapa
+        function printMap() {
+            // Usar html2canvas para capturar el contenido de impresión
+            const printContent = document.querySelector('.print-content');
+            
+            html2canvas(printContent, {
+                scale: 2,
+                useCORS: true,
+                logging: false
+            }).then(canvas => {
+                // Crear una ventana nueva para imprimir
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write('<html><head><title>Impresión Mapa</title>');
+                printWindow.document.write('<style>body { margin: 0; } img { width: 100%; }</style>');
+                printWindow.document.write('</head><body>');
+                printWindow.document.write('<img src="' + canvas.toDataURL('image/png') + '">');
+                printWindow.document.write('</body></html>');
+                printWindow.document.close();
+                
+                // Imprimir cuando la imagen esté cargada
+                printWindow.onload = function() {
+                    printWindow.print();
+                };
+            });
+        }
+        
         // Eventos al cargar la página
         document.addEventListener('DOMContentLoaded', function() {
             // Cargar datos existentes
@@ -1579,6 +1872,31 @@
             document.getElementById('search-input').addEventListener('keyup', function(e) {
                 if (e.key === 'Enter') {
                     updateDataList(this.value);
+                }
+            });
+            
+            // Eventos para la ventana de impresión
+            document.getElementById('print-map-btn').addEventListener('click', printMap);
+            document.getElementById('close-print-btn').addEventListener('click', function() {
+                document.getElementById('print-overlay').style.display = 'none';
+            });
+            document.getElementById('print-close-btn').addEventListener('click', function() {
+                document.getElementById('print-overlay').style.display = 'none';
+            });
+            
+            // Event delegation para botones de impresión en popups
+            map.on('popupopen', function(e) {
+                const popup = e.popup;
+                const content = popup.getElement();
+                const printBtn = content.querySelector('.btn-popup-print');
+                if (printBtn) {
+                    printBtn.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        const data = farmData.find(d => d.id === id);
+                        if (data) {
+                            showPrintView(data);
+                        }
+                    });
                 }
             });
             
