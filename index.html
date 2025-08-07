@@ -22,7 +22,7 @@
         }
         
         body {
-            background: linear-gradient(135deg, #f0f5f9 0%, #e0eaf5 100%);
+            background: #e9f7ef;
             min-height: 100vh;
             color: #333;
             overflow-x: hidden;
@@ -34,31 +34,33 @@
             margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
+            height: 100vh;
         }
         
         header {
             background: linear-gradient(to right, #1a5f23, #2e7d32);
             color: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 12px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
             display: flex;
             align-items: center;
             justify-content: space-between;
             position: relative;
             border-bottom: 3px solid #0d3c14;
+            z-index: 10;
         }
         
         .logo-container {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
         
         .logo {
-            width: 50px;
-            height: 50px;
+            width: 45px;
+            height: 45px;
             background: white;
             border-radius: 50%;
             display: flex;
@@ -66,35 +68,36 @@
             justify-content: center;
             font-weight: bold;
             color: #2e7d32;
-            font-size: 10px;
+            font-size: 9px;
             text-align: center;
             padding: 3px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
         }
         
         h1 {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
+            line-height: 1.2;
         }
         
         .subtitle {
-            font-size: 12px;
+            font-size: 11px;
             opacity: 0.9;
-            margin-top: 3px;
+            margin-top: 2px;
             font-weight: 300;
         }
         
         #current-date {
-            font-size: 12px;
+            font-size: 11px;
             text-align: right;
-            min-width: 100px;
+            min-width: 90px;
         }
         
         .map-container {
-            height: 65vh;
-            border-radius: 10px;
+            flex: 1;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             position: relative;
         }
         
@@ -112,10 +115,10 @@
             flex-direction: row;
             gap: 8px;
             z-index: 1000;
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.9);
             padding: 8px;
             border-radius: 25px;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
             flex-wrap: wrap;
             max-width: calc(100% - 20px);
             justify-content: center;
@@ -125,12 +128,12 @@
             background: white;
             color: #2e7d32;
             border: none;
-            width: 45px;
-            height: 45px;
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 18px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+            font-size: 16px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.12);
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
@@ -141,7 +144,7 @@
             background: #2e7d32;
             color: white;
             transform: translateY(-2px) scale(1.05);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.18);
         }
         
         .floating-btn.active {
@@ -163,7 +166,7 @@
             transform: translateY(100%);
             transition: transform 0.3s ease-out;
             border-radius: 20px 20px 0 0;
-            box-shadow: 0 -5px 25px rgba(0,0,0,0.2);
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.15);
         }
         
         .floating-panel.active {
@@ -173,7 +176,7 @@
         
         .panel {
             background: #f8f9fa;
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 15px;
             border-left: 4px solid #2e7d32;
             margin-bottom: 15px;
@@ -204,7 +207,7 @@
             width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 14px;
             transition: all 0.3s;
             background: #fff;
@@ -224,7 +227,7 @@
         .coordinates {
             background: #e8f5e9;
             padding: 10px;
-            border-radius: 6px;
+            border-radius: 8px;
             font-family: monospace;
             margin: 8px 0;
             font-size: 13px;
@@ -236,7 +239,7 @@
             color: white;
             border: none;
             padding: 12px 15px;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
             font-weight: 500;
@@ -246,7 +249,7 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
         .btn:hover, .btn:active {
@@ -308,7 +311,7 @@
             border-radius: 8px;
             padding: 12px;
             margin-bottom: 10px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
             border-left: 3px solid #4caf50;
             position: relative;
             transition: all 0.3s;
@@ -316,7 +319,7 @@
         
         .data-item:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         
         .data-item h3 {
@@ -351,7 +354,7 @@
             padding: 10px;
             border-radius: 8px;
             z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
             max-width: 160px;
             border: 1px solid #e0e0e0;
         }
@@ -379,7 +382,7 @@
             border-radius: 50%;
             margin-right: 8px;
             flex-shrink: 0;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
         }
         
         .color-finca {
@@ -417,15 +420,15 @@
         
         footer {
             text-align: center;
-            padding: 15px;
+            padding: 12px;
             color: #666;
-            font-size: 12px;
+            font-size: 11px;
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 3px;
             background: #f8f9fa;
             border-radius: 8px;
-            box-shadow: 0 1px 5px rgba(0,0,0,0.08);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
         }
         
         .search-container {
@@ -466,7 +469,7 @@
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
         }
         
         .instructions-content h2 {
@@ -627,7 +630,7 @@
             z-index: 1000;
             background: white;
             border-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
             padding: 5px;
             border: 1px solid #e0e0e0;
         }
@@ -675,7 +678,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             opacity: 0;
             transition: opacity 0.3s, transform 0.3s;
             pointer-events: none;
@@ -701,7 +704,7 @@
             background: white;
             border-radius: 8px;
             padding: 10px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
             text-align: center;
             border-top: 3px solid #2e7d32;
         }
@@ -762,7 +765,7 @@
                 max-height: calc(75vh - 100px);
                 border-radius: 12px;
                 transform: none;
-                box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+                box-shadow: 0 6px 18px rgba(0,0,0,0.15);
             }
             
             .floating-panel.active {
@@ -778,9 +781,9 @@
             }
             
             .logo {
-                width: 60px;
-                height: 60px;
-                font-size: 11px;
+                width: 55px;
+                height: 55px;
+                font-size: 10px;
             }
             
             h1 {
@@ -790,6 +793,20 @@
             .subtitle {
                 font-size: 14px;
             }
+        }
+        
+        .elevation-info {
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 14px;
+            border-left: 3px solid #2196f3;
+        }
+        
+        .elevation-value {
+            font-weight: bold;
+            color: #1976d2;
         }
     </style>
 </head>
@@ -822,9 +839,6 @@
                 <button id="location-btn" class="floating-btn" title="Centrar en mi ubicación">
                     <i class="fas fa-location-crosshairs"></i>
                 </button>
-                <button id="print-btn" class="floating-btn" title="Imprimir mapa">
-                    <i class="fas fa-print"></i>
-                </button>
                 <button id="help-btn" class="floating-btn" title="Instrucciones de uso">
                     <i class="fas fa-question-circle"></i>
                 </button>
@@ -846,6 +860,10 @@
                     <div class="legend-color color-ubicacion"></div>
                     <span>Su Ubicación</span>
                 </div>
+                <div class="legend-item">
+                    <div class="legend-color color-new"></div>
+                    <span>Nuevo Registro</span>
+                </div>
             </div>
         </div>
         
@@ -857,6 +875,7 @@
             <div class="panel">
                 <h2><i class="fas fa-map-marker-alt"></i> Captura de Datos</h2>
                 <div class="coordinates" id="coordinates">Haga clic en el mapa para capturar coordenadas</div>
+                <div class="elevation-info" id="elevation-info">Altura sobre el nivel del mar: <span class="elevation-value" id="elevation-value">--</span> m</div>
                 
                 <div class="form-group">
                     <label for="beneficiary">Nombre del Beneficiario *</label>
@@ -1008,7 +1027,7 @@
                     <li><strong>Consulta de datos:</strong> Haga clic en el botón <i class="fas fa-database"></i> para ver todos los registros guardados. Puede buscar registros específicos utilizando el campo de búsqueda.</li>
                     <li><strong>Carga de CSV:</strong> Use el botón <i class="fas fa-file-csv"></i> para cargar datos desde archivos CSV.</li>
                     <li><strong>Ubicación:</strong> Use el botón <i class="fas fa-location-crosshairs"></i> para centrar el mapa en su posición actual.</li>
-                    <li><strong>Impresión:</strong> Genere reportes imprimibles con el botón <i class="fas fa-print"></i>.</li>
+                    <li><strong>Altura sobre el nivel del mar:</strong> Se muestra automáticamente al seleccionar una ubicación en el mapa.</li>
                 </ul>
                 <p><strong>Nota:</strong> Los campos marcados con * son obligatorios para guardar un registro.</p>
                 <div style="margin-top: 15px; background: #e8f5e9; padding: 12px; border-radius: 8px;">
@@ -1018,6 +1037,7 @@
                         <li>Deslice con un dedo para desplazar el mapa</li>
                         <li>Toque un marcador para ver información detallada</li>
                         <li>Los datos se guardan automáticamente en su dispositivo</li>
+                        <li>Los paneles se pueden cerrar tocando la X en la esquina superior derecha</li>
                     </ul>
                 </div>
             </div>
@@ -1061,6 +1081,7 @@
         
         // Variables para almacenamiento
         let currentCoords = null;
+        let currentElevation = null;
         let farmData = JSON.parse(localStorage.getItem('farmData')) || [];
         let tempMarkers = [];
         let userMarker = null;
@@ -1100,6 +1121,22 @@
         map.addLayer(farmCluster);
         map.addLayer(csvCluster);
         
+        // Función para obtener la elevación desde Open-Elevation API
+        async function getElevation(lat, lng) {
+            try {
+                const response = await fetch(`https://api.open-elevation.com/api/v1/lookup?locations=${lat},${lng}`);
+                const data = await response.json();
+                
+                if (data.results && data.results.length > 0) {
+                    return data.results[0].elevation.toFixed(1);
+                }
+                return null;
+            } catch (error) {
+                console.error('Error obteniendo elevación:', error);
+                return null;
+            }
+        }
+        
         // Función para mostrar notificaciones toast
         function showToast(message, duration = 3000) {
             const toast = document.getElementById('toast');
@@ -1113,38 +1150,9 @@
             }, duration);
         }
         
-        // Función para exportar datos a CSV
-        function exportToCSV() {
-            if (farmData.length === 0) {
-                showToast('No hay datos para exportar', 4000);
-                return;
-            }
-            
-            // Crear encabezados CSV
-            let csvContent = "Beneficiario,Finca,Cultivo,Latitud,Longitud,Observaciones,Fecha\n";
-            
-            // Añadir datos
-            farmData.forEach(data => {
-                csvContent += `"${data.beneficiary}","${data.farm}","${getCropName(data.crop)}",${data.coords.lat},${data.coords.lng},"${data.observations || ''}","${data.date}"\n`;
-            });
-            
-            // Crear archivo CSV
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.setAttribute('href', url);
-            link.setAttribute('download', `datos_fincas_${new Date().toISOString().slice(0,10)}.csv`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            showToast('Datos exportados a CSV');
-        }
-        
         // Función para guardar datos
-        function saveData() {
-            if (!currentCoords) {
+        async function saveData() {
+            if (!currentCoords || currentElevation === null) {
                 showToast('Seleccione ubicación primero', 4000);
                 return;
             }
@@ -1163,6 +1171,7 @@
             const data = {
                 id: editingId || Date.now(),
                 coords: currentCoords,
+                elevation: currentElevation,
                 beneficiary,
                 farm,
                 crop,
@@ -1199,7 +1208,9 @@
             document.getElementById('crop').value = '';
             document.getElementById('observations').value = '';
             document.getElementById('coordinates').textContent = 'Datos guardados! Seleccione nueva ubicación';
+            document.getElementById('elevation-value').textContent = '--';
             currentCoords = null;
+            currentElevation = null;
             clearTempMarkers();
         }
         
@@ -1250,6 +1261,7 @@
                     <b>${data.farm}</b><br>
                     Beneficiario: ${data.beneficiary}<br>
                     Cultivo: ${getCropName(data.crop)}<br>
+                    Altura: ${data.elevation} m<br>
                     Fecha: ${data.date}
                 `);
                 
@@ -1279,6 +1291,7 @@
                     <h3>${data.farm}</h3>
                     <p><strong>Beneficiario:</strong> ${data.beneficiary}</p>
                     <p><strong>Cultivo:</strong> ${getCropName(data.crop)}</p>
+                    <p><strong>Altura:</strong> ${data.elevation} m</p>
                     <p><strong>Ubicación:</strong> ${data.coords.lat.toFixed(6)}, ${data.coords.lng.toFixed(6)}</p>
                     <p><strong>Fecha:</strong> ${data.date}</p>
                     <div class="actions">
@@ -1323,10 +1336,12 @@
             document.getElementById('crop').value = data.crop;
             document.getElementById('observations').value = data.observations || '';
             
-            // Establecer coordenadas
+            // Establecer coordenadas y elevación
             currentCoords = data.coords;
+            currentElevation = data.elevation;
             document.getElementById('coordinates').textContent = 
                 `Lat: ${currentCoords.lat.toFixed(6)}, Lng: ${currentCoords.lng.toFixed(6)}`;
+            document.getElementById('elevation-value').textContent = data.elevation;
             
             // Centrar mapa en la ubicación
             map.setView(currentCoords, 15);
@@ -1364,7 +1379,9 @@
             document.getElementById('crop').value = '';
             document.getElementById('observations').value = '';
             document.getElementById('coordinates').textContent = 'Haga clic en el mapa para capturar coordenadas';
+            document.getElementById('elevation-value').textContent = '--';
             currentCoords = null;
+            currentElevation = null;
             
             // Actualizar marcadores
             updateMapMarkers();
@@ -1448,172 +1465,6 @@
             document.getElementById('csv-btn').classList.remove('active');
         }
         
-        // Función para cargar datos CSV
-        function loadCSV() {
-            const fileInput = document.getElementById('csv-file');
-            const file = fileInput.files[0];
-            
-            if (!file) {
-                showToast('Seleccione archivo CSV', 4000);
-                return;
-            }
-            
-            Papa.parse(file, {
-                header: true,
-                skipEmptyLines: true,
-                complete: function(results) {
-                    if (results.errors.length > 0) {
-                        showToast('Error en CSV: ' + results.errors[0].message, 5000);
-                        return;
-                    }
-                    
-                    // Validar estructura básica
-                    const validFields = ['beneficiario', 'finca', 'cultivo', 'latitud', 'longitud'];
-                    const firstRow = results.data[0];
-                    
-                    if (!firstRow) {
-                        showToast('CSV vacío', 4000);
-                        return;
-                    }
-                    
-                    const hasValidFields = validFields.every(field => 
-                        Object.keys(firstRow).some(key => key.toLowerCase().includes(field))
-                    );
-                    
-                    if (!hasValidFields) {
-                        showToast('Estructura CSV inválida', 5000);
-                        return;
-                    }
-                    
-                    // Normalizar datos
-                    csvData = results.data.map(row => {
-                        // Normalizar nombres de columnas
-                        const normalizedRow = {};
-                        Object.keys(row).forEach(key => {
-                            const normalizedKey = key.toLowerCase();
-                            if (normalizedKey.includes('beneficiario')) normalizedRow.beneficiario = row[key];
-                            if (normalizedKey.includes('finca')) normalizedRow.finca = row[key];
-                            if (normalizedKey.includes('cultivo')) normalizedRow.cultivo = row[key];
-                            if (normalizedKey.includes('latitud')) normalizedRow.latitud = parseFloat(row[key]);
-                            if (normalizedKey.includes('longitud')) normalizedRow.longitud = parseFloat(row[key]);
-                        });
-                        return normalizedRow;
-                    }).filter(row => 
-                        row.beneficiario && row.finca && row.cultivo && 
-                        !isNaN(row.latitud) && !isNaN(row.longitud)
-                    );
-                    
-                    if (csvData.length === 0) {
-                        showToast('No hay datos válidos', 4000);
-                        return;
-                    }
-                    
-                    // Guardar en localStorage
-                    localStorage.setItem('csvData', JSON.stringify(csvData));
-                    
-                    // Actualizar vista
-                    updateCSVTableView();
-                    document.getElementById('csv-count').textContent = csvData.length;
-                    
-                    showToast(`${csvData.length} registros cargados`);
-                }
-            });
-        }
-        
-        // Actualizar vista de tabla CSV
-        function updateCSVTableView() {
-            const container = document.getElementById('csv-table-container');
-            if (csvData.length === 0) {
-                container.innerHTML = '<div class="data-item"><p>No hay datos CSV cargados</p></div>';
-                return;
-            }
-            
-            let tableHTML = `
-                <table class="csv-table">
-                    <thead>
-                        <tr>
-                            <th>Beneficiario</th>
-                            <th>Finca</th>
-                            <th>Cultivo</th>
-                            <th>Latitud</th>
-                            <th>Longitud</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-            
-            csvData.forEach(row => {
-                tableHTML += `
-                    <tr>
-                        <td>${row.beneficiario || ''}</td>
-                        <td>${row.finca || ''}</td>
-                        <td>${row.cultivo || ''}</td>
-                        <td>${row.latitud.toFixed(6)}</td>
-                        <td>${row.longitud.toFixed(6)}</td>
-                    </tr>
-                `;
-            });
-            
-            tableHTML += `
-                    </tbody>
-                </table>
-            `;
-            
-            container.innerHTML = tableHTML;
-        }
-        
-        // Función para mostrar datos CSV en el mapa
-        function plotCSVData() {
-            // Eliminar marcadores CSV anteriores
-            csvCluster.clearLayers();
-            
-            if (csvData.length === 0) {
-                showToast('No hay datos CSV', 4000);
-                return;
-            }
-            
-            // Añadir nuevos marcadores
-            csvData.forEach(row => {
-                const coords = [row.latitud, row.longitud];
-                const marker = L.marker(coords, {
-                    icon: L.divIcon({
-                        className: 'csv-marker',
-                        html: `<div style="background-color:#9c27b0; width:20px; height:20px; border-radius:50%; border:2px solid white; box-shadow:0 0 8px rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center;">
-                                <i class="fas fa-file-csv" style="color:white; font-size:9px;"></i>
-                           </div>`,
-                        iconSize: [24, 24]
-                    })
-                });
-                
-                marker.bindPopup(`
-                    <b>${row.finca}</b><br>
-                    Beneficiario: ${row.beneficiario}<br>
-                    Cultivo: ${row.cultivo}
-                `);
-                
-                csvCluster.addLayer(marker);
-            });
-            
-            // Ajustar vista del mapa para mostrar todos los marcadores
-            const bounds = L.latLngBounds(csvData.map(row => [row.latitud, row.longitud]));
-            map.fitBounds(bounds, { padding: [50, 50] });
-            
-            showToast('Datos CSV en mapa');
-        }
-        
-        // Limpiar datos CSV
-        function clearCSVData() {
-            if (!confirm('¿Eliminar datos CSV?')) return;
-            
-            csvData = [];
-            localStorage.removeItem('csvData');
-            updateCSVTableView();
-            csvCluster.clearLayers();
-            document.getElementById('csv-count').textContent = '0';
-            
-            showToast('Datos CSV eliminados');
-        }
-        
         // Eventos al cargar la página
         document.addEventListener('DOMContentLoaded', function() {
             // Cargar datos existentes
@@ -1632,10 +1483,15 @@
             }).addTo(map);
             
             // Evento para capturar coordenadas al hacer clic en el mapa
-            map.on('click', function(e) {
+            map.on('click', async function(e) {
                 currentCoords = e.latlng;
                 document.getElementById('coordinates').textContent = 
                     `Lat: ${currentCoords.lat.toFixed(6)}, Lng: ${currentCoords.lng.toFixed(6)}`;
+                
+                // Obtener elevación
+                document.getElementById('elevation-value').textContent = 'cargando...';
+                currentElevation = await getElevation(currentCoords.lat, currentCoords.lng);
+                document.getElementById('elevation-value').textContent = currentElevation || '--';
                 
                 // Limpiar marcadores temporales
                 clearTempMarkers();
@@ -1678,7 +1534,6 @@
             });
             
             document.getElementById('location-btn').addEventListener('click', locateUser);
-            document.getElementById('print-btn').addEventListener('click', printMap);
             document.getElementById('help-btn').addEventListener('click', function() {
                 document.getElementById('instructions-overlay').style.display = 'flex';
             });
@@ -1706,27 +1561,6 @@
                 if (e.key === 'Enter') {
                     updateDataList(this.value);
                 }
-            });
-            
-            // CSV handlers
-            document.getElementById('load-csv-btn').addEventListener('click', loadCSV);
-            document.getElementById('plot-csv-btn').addEventListener('click', plotCSVData);
-            document.getElementById('clear-csv-btn').addEventListener('click', clearCSVData);
-            
-            // Tab handlers
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.addEventListener('click', function() {
-                    // Update tabs
-                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // Update content
-                    const tabId = this.getAttribute('data-tab');
-                    document.querySelectorAll('.tab-content').forEach(content => {
-                        content.classList.remove('active');
-                    });
-                    document.getElementById(tabId).classList.add('active');
-                });
             });
             
             // Actualizar fecha actual
@@ -1774,156 +1608,6 @@
             } else {
                 showToast('Geolocalización no soportada', 4000);
             }
-        }
-        
-        // Función para imprimir el mapa
-        function printMap() {
-            // Ocultar controles flotantes antes de capturar
-            document.querySelector('.floating-controls').style.visibility = 'hidden';
-            document.querySelector('.legend').style.visibility = 'hidden';
-            document.querySelector('.leaflet-control-layers').style.visibility = 'hidden';
-            
-            // Capturar el mapa como imagen
-            html2canvas(document.getElementById('map'), {
-                scale: 2, // Aumentar resolución
-                useCORS: true,
-                logging: false
-            }).then(canvas => {
-                // Restaurar visibilidad
-                document.querySelector('.floating-controls').style.visibility = 'visible';
-                document.querySelector('.legend').style.visibility = 'visible';
-                document.querySelector('.leaflet-control-layers').style.visibility = 'visible';
-                
-                const printContainer = document.getElementById('print-container');
-                printContainer.innerHTML = '';
-                
-                // Crear contenido para imprimir
-                const printContent = document.createElement('div');
-                printContent.style.width = '100%';
-                printContent.style.height = '100%';
-                printContent.style.position = 'relative';
-                
-                // Título
-                const title = document.createElement('h1');
-                title.textContent = 'Reporte de Visitas a Fincas';
-                title.style.textAlign = 'center';
-                title.style.marginBottom = '20px';
-                title.style.color = '#2e7d32';
-                printContent.appendChild(title);
-                
-                // Subtítulo
-                const subtitle = document.createElement('h2');
-                subtitle.textContent = 'Convenio FNC y CVC - Seguridad Alimentaria';
-                subtitle.style.textAlign = 'center';
-                subtitle.style.marginBottom = '30px';
-                subtitle.style.color = '#555';
-                subtitle.style.fontSize = '18px';
-                printContent.appendChild(subtitle);
-                
-                // Mapa impreso
-                const mapImg = document.createElement('img');
-                mapImg.src = canvas.toDataURL('image/png');
-                mapImg.style.width = '100%';
-                mapImg.style.height = '300px';
-                mapImg.style.border = '1px solid #ddd';
-                mapImg.style.marginBottom = '20px';
-                printContent.appendChild(mapImg);
-                
-                // Tabla de datos
-                const table = document.createElement('table');
-                table.style.width = '100%';
-                table.style.borderCollapse = 'collapse';
-                table.style.marginTop = '20px';
-                table.style.border = '1px solid #ddd';
-                
-                // Cabecera de tabla
-                const thead = document.createElement('thead');
-                thead.innerHTML = `
-                    <tr style="background-color: #2e7d32; color: white;">
-                        <th style="padding: 10px; text-align: left;">Finca</th>
-                        <th style="padding: 10px; text-align: left;">Beneficiario</th>
-                        <th style="padding: 10px; text-align: left;">Cultivo</th>
-                        <th style="padding: 10px; text-align: left;">Ubicación</th>
-                        <th style="padding: 10px; text-align: left;">Fecha</th>
-                    </tr>
-                `;
-                table.appendChild(thead);
-                
-                // Cuerpo de tabla
-                const tbody = document.createElement('tbody');
-                farmData.forEach(data => {
-                    const row = document.createElement('tr');
-                    row.style.borderBottom = '1px solid #ddd';
-                    row.innerHTML = `
-                        <td style="padding: 8px;">${data.farm}</td>
-                        <td style="padding: 8px;">${data.beneficiary}</td>
-                        <td style="padding: 8px;">${getCropName(data.crop)}</td>
-                        <td style="padding: 8px;">${data.coords.lat.toFixed(6)}, ${data.coords.lng.toFixed(6)}</td>
-                        <td style="padding: 8px;">${data.date}</td>
-                    `;
-                    tbody.appendChild(row);
-                });
-                table.appendChild(tbody);
-                printContent.appendChild(table);
-                
-                // Fecha y firma
-                const footer = document.createElement('div');
-                footer.style.marginTop = '30px';
-                footer.style.display = 'flex';
-                footer.style.justifyContent = 'space-between';
-                footer.style.fontSize = '14px';
-                
-                const date = document.createElement('div');
-                date.innerHTML = `<strong>Fecha de generación:</strong> ${new Date().toLocaleDateString('es-CO')}`;
-                footer.appendChild(date);
-                
-                const signature = document.createElement('div');
-                signature.innerHTML = '<strong>Responsable:</strong> ________________________';
-                footer.appendChild(signature);
-                
-                printContent.appendChild(footer);
-                
-                // Crédito
-                const credit = document.createElement('div');
-                credit.style.marginTop = '20px';
-                credit.style.textAlign = 'center';
-                credit.style.fontSize = '12px';
-                credit.style.color = '#777';
-                credit.innerHTML = 'Elaborado por Diego Castaño Esp. en SIG';
-                printContent.appendChild(credit);
-                
-                printContainer.appendChild(printContent);
-                
-                // Abrir ventana de impresión
-                const printWindow = window.open('', '_blank');
-                printWindow.document.write(`
-                    <html>
-                    <head>
-                        <title>Reporte de Visitas a Fincas</title>
-                        <style>
-                            body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
-                            @media print {
-                                @page { size: A4; margin: 1cm; }
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        ${printContainer.innerHTML}
-                        <script>
-                            window.onload = function() {
-                                window.print();
-                                window.onafterprint = function() {
-                                    window.close();
-                                };
-                            };
-                        <\/script>
-                    </body>
-                    </html>
-                `);
-                printWindow.document.close();
-                
-                showToast('Preparando impresión...');
-            });
         }
     </script>
 </body>
