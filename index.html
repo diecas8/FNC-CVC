@@ -21,7 +21,7 @@
         }
         
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            background: linear-gradient(135deg, #f0f5f9 0%, #e0eaf5 100%);
             min-height: 100vh;
             color: #333;
             padding: 20px;
@@ -42,12 +42,13 @@
             color: white;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
             margin-bottom: 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             position: relative;
+            border-bottom: 3px solid #0d3c14;
         }
         
         .logo-container {
@@ -69,24 +70,27 @@
             font-size: 12px;
             text-align: center;
             padding: 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
         
         h1 {
             font-size: 24px;
-            font-weight: 600;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
         
         .subtitle {
             font-size: 16px;
             opacity: 0.9;
             margin-top: 5px;
+            font-weight: 300;
         }
         
         .map-container {
             height: 78vh;
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.18);
             position: relative;
             grid-column: 1 / -1;
         }
@@ -105,6 +109,10 @@
             flex-direction: column;
             gap: 10px;
             z-index: 1000;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 10px;
+            border-radius: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
         
         .floating-btn {
@@ -116,7 +124,7 @@
             border-radius: 50%;
             cursor: pointer;
             font-size: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
@@ -126,7 +134,8 @@
         .floating-btn:hover {
             background: #2e7d32;
             color: white;
-            transform: translateY(-2px);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.25);
         }
         
         .floating-btn.active {
@@ -139,24 +148,31 @@
             top: 80px;
             right: 20px;
             background: white;
-            border-radius: 10px;
+            border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.18);
             width: 350px;
             z-index: 1000;
             display: none;
             max-height: calc(78vh - 100px);
             overflow-y: auto;
+            border: 1px solid #e0e0e0;
         }
         
         .floating-panel.active {
             display: block;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
         
         .panel {
             background: #f8f9fa;
             border-radius: 8px;
-            padding: 15px;
+            padding: 18px;
             border-left: 4px solid #2e7d32;
             margin-bottom: 20px;
         }
@@ -179,36 +195,46 @@
             margin-bottom: 5px;
             font-weight: 500;
             color: #555;
+            font-size: 14px;
         }
         
         input, select, textarea {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 14px;
+            transition: all 0.3s;
+            background: #fff;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #2e7d32;
+            box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.2);
         }
         
         textarea {
-            height: 80px;
+            height: 100px;
             resize: vertical;
         }
         
         .coordinates {
             background: #e8f5e9;
-            padding: 10px;
-            border-radius: 4px;
+            padding: 12px;
+            border-radius: 6px;
             font-family: monospace;
             margin: 10px 0;
             font-size: 14px;
+            border-left: 3px solid #2e7d32;
         }
         
         .btn {
             background: #2e7d32;
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 4px;
+            padding: 13px 20px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 15px;
             font-weight: 500;
@@ -218,11 +244,13 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.12);
         }
         
         .btn:hover {
             background: #1b5e20;
             transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.18);
         }
         
         .btn-secondary {
@@ -273,32 +301,43 @@
             background: #388e3c;
         }
         
+        .btn-info {
+            background: #00bcd4;
+        }
+        
         .data-item {
             background: white;
-            border-radius: 6px;
-            padding: 12px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.08);
             border-left: 3px solid #4caf50;
             position: relative;
+            transition: all 0.3s;
+        }
+        
+        .data-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         
         .data-item h3 {
             font-size: 16px;
             color: #1b5e20;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
         }
         
         .data-item p {
             font-size: 14px;
             color: #555;
-            margin: 3px 0;
+            margin: 4px 0;
+            line-height: 1.4;
         }
         
         .data-item .actions {
             display: flex;
-            gap: 5px;
-            margin-top: 10px;
+            gap: 8px;
+            margin-top: 12px;
         }
         
         .legend {
@@ -306,12 +345,22 @@
             bottom: 20px;
             left: 20px;
             background: rgba(255, 255, 255, 0.95);
-            padding: 12px;
-            border-radius: 5px;
+            padding: 15px;
+            border-radius: 8px;
             z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 3px 15px rgba(0,0,0,0.18);
             font-size: 14px;
-            max-width: 200px;
+            max-width: 220px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .legend-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2e7d32;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
         
         .legend-item {
@@ -326,6 +375,7 @@
             border-radius: 50%;
             margin-right: 10px;
             flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         
         .color-finca {
@@ -348,6 +398,10 @@
             background: #9c27b0;
         }
         
+        .color-new {
+            background: #4caf50;
+        }
+        
         .print-container {
             position: absolute;
             left: -9999px;
@@ -367,6 +421,9 @@
             display: flex;
             flex-direction: column;
             gap: 5px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
         .search-container {
@@ -381,16 +438,16 @@
         
         .search-container button {
             width: auto;
-            padding: 10px 15px;
+            padding: 12px 16px;
         }
         
         .instructions-overlay {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.85);
             z-index: 2000;
             display: flex;
             align-items: center;
@@ -400,12 +457,14 @@
         
         .instructions-content {
             background: white;
-            border-radius: 10px;
+            border-radius: 12px;
             padding: 30px;
             width: 90%;
-            max-width: 600px;
+            max-width: 700px;
             max-height: 90vh;
             overflow-y: auto;
+            position: relative;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
         }
         
         .instructions-content h2 {
@@ -414,6 +473,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            font-size: 24px;
         }
         
         .instructions-content ul {
@@ -424,6 +484,7 @@
         .instructions-content li {
             margin-bottom: 15px;
             line-height: 1.6;
+            font-size: 16px;
         }
         
         .close-btn {
@@ -441,6 +502,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .close-btn:hover {
+            transform: rotate(90deg) scale(1.1);
         }
         
         .csv-upload-container {
@@ -457,6 +523,7 @@
             margin-top: 15px;
             border: 1px solid #ddd;
             border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         
         .csv-table {
@@ -467,15 +534,17 @@
         .csv-table th {
             background: #7b1fa2;
             color: white;
-            padding: 10px;
+            padding: 12px 10px;
             text-align: left;
             position: sticky;
             top: 0;
+            font-weight: 500;
         }
         
         .csv-table td {
-            padding: 8px 10px;
-            border-bottom: 1px solid #ddd;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
         }
         
         .csv-table tr:nth-child(even) {
@@ -490,13 +559,23 @@
             display: flex;
             margin-bottom: 15px;
             border-bottom: 2px solid #2e7d32;
+            background: #f8f9fa;
+            border-radius: 6px;
+            overflow: hidden;
         }
         
         .tab {
-            padding: 10px 15px;
+            padding: 12px 15px;
             cursor: pointer;
             background: #f8f9fa;
-            border-radius: 5px 5px 0 0;
+            font-weight: 500;
+            flex: 1;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover {
+            background: #e8f5e9;
         }
         
         .tab.active {
@@ -510,6 +589,12 @@
         
         .tab-content.active {
             display: block;
+            animation: fadeIn 0.4s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
         /* Control de capas personalizado */
@@ -519,9 +604,10 @@
             right: 20px;
             z-index: 1000;
             background: white;
-            border-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            border-radius: 6px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.18);
             padding: 5px;
+            border: 1px solid #e0e0e0;
         }
         
         .leaflet-control-layers-toggle {
@@ -533,7 +619,7 @@
         }
         
         .leaflet-control-layers-expanded {
-            padding: 6px 10px;
+            padding: 8px 12px;
         }
         
         .leaflet-control-layers-base {
@@ -544,11 +630,103 @@
             display: flex;
             align-items: center;
             cursor: pointer;
-            padding: 3px 0;
+            padding: 5px 0;
         }
         
         .leaflet-control-layers-base input {
-            margin-right: 5px;
+            margin-right: 8px;
+        }
+        
+        /* Toast notifications */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 30px;
+            z-index: 3000;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            pointer-events: none;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        /* Clúster de marcadores personalizado */
+        .marker-cluster-custom {
+            background: rgba(233, 30, 99, 0.6);
+        }
+        
+        .marker-cluster-custom div {
+            background: rgba(233, 30, 99, 0.8);
+            color: white;
+        }
+        
+        .marker-cluster-csv {
+            background: rgba(156, 39, 176, 0.6);
+        }
+        
+        .marker-cluster-csv div {
+            background: rgba(156, 39, 176, 0.8);
+            color: white;
+        }
+        
+        /* Estadísticas */
+        .stats-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-card {
+            flex: 1;
+            min-width: 150px;
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+            text-align: center;
+            border-top: 4px solid #2e7d32;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2e7d32;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        /* Estilos para impresión */
+        @media print {
+            .floating-controls,
+            .legend,
+            .floating-panel,
+            .leaflet-control-layers {
+                display: none !important;
+            }
+            
+            .map-container {
+                height: 80vh;
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
         }
         
         @media (max-width: 900px) {
@@ -577,40 +755,9 @@
             .leaflet-control-layers {
                 top: 140px;
             }
-        }
-        
-        /* Clúster de marcadores personalizado */
-        .marker-cluster-custom {
-            background: rgba(233, 30, 99, 0.6);
-        }
-        
-        .marker-cluster-custom div {
-            background: rgba(233, 30, 99, 0.8);
-            color: white;
-        }
-        
-        .marker-cluster-csv {
-            background: rgba(156, 39, 176, 0.6);
-        }
-        
-        .marker-cluster-csv div {
-            background: rgba(156, 39, 176, 0.8);
-            color: white;
-        }
-        
-        /* Estilos para impresión */
-        @media print {
-            .floating-controls,
-            .legend,
-            .floating-panel,
-            .leaflet-control-layers {
-                display: none !important;
-            }
             
-            .map-container {
-                height: 80vh;
-                box-shadow: none;
-                border: 1px solid #ddd;
+            .stats-container {
+                flex-direction: column;
             }
         }
     </style>
@@ -678,6 +825,8 @@
                             <option value="frijol">Frijol</option>
                             <option value="hortalizas">Hortalizas</option>
                             <option value="frutales">Frutales</option>
+                            <option value="cacao">Cacao</option>
+                            <option value="ganaderia">Ganadería</option>
                         </select>
                     </div>
                     
@@ -700,8 +849,23 @@
                 <div class="panel">
                     <h2><i class="fas fa-search"></i> Consultar Datos</h2>
                     
+                    <div class="stats-container">
+                        <div class="stat-card">
+                            <div class="stat-value" id="total-farms">0</div>
+                            <div class="stat-label">Fincas Registradas</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="total-beneficiaries">0</div>
+                            <div class="stat-label">Beneficiarios</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="last-update">Hoy</div>
+                            <div class="stat-label">Última Actualización</div>
+                        </div>
+                    </div>
+                    
                     <div class="search-container">
-                        <input type="text" id="search-input" placeholder="Buscar por nombre o finca...">
+                        <input type="text" id="search-input" placeholder="Buscar por nombre, finca o cultivo...">
                         <button id="search-btn" class="btn btn-secondary">
                             <i class="fas fa-search"></i>
                         </button>
@@ -714,6 +878,9 @@
                     <div class="form-group" style="margin-top: 20px;">
                         <button id="export-btn" class="btn btn-export">
                             <i class="fas fa-file-export"></i> Exportar a CSV
+                        </button>
+                        <button id="clear-all-btn" class="btn btn-delete" style="margin-top: 10px;">
+                            <i class="fas fa-trash"></i> Eliminar Todos los Datos
                         </button>
                     </div>
                 </div>
@@ -773,6 +940,9 @@
             </div>
             
             <div class="legend">
+                <div class="legend-title">
+                    <i class="fas fa-map-pin"></i> Leyenda
+                </div>
                 <div class="legend-item">
                     <div class="legend-color color-finca"></div>
                     <span>Fincas Registradas</span>
@@ -793,6 +963,10 @@
                     <div class="legend-color color-edit"></div>
                     <span>Edición</span>
                 </div>
+                <div class="legend-item">
+                    <div class="legend-color color-new"></div>
+                    <span>Nuevo Registro</span>
+                </div>
             </div>
         </div>
         
@@ -811,9 +985,24 @@
                     <li><strong>Visualización CSV:</strong> Los datos CSV se pueden visualizar en tabla y también como marcadores en el mapa.</li>
                     <li><strong>Ubicación:</strong> Use el botón <i class="fas fa-location-crosshairs"></i> para centrar el mapa en su posición actual.</li>
                     <li><strong>Impresión:</strong> Genere reportes imprimibles con el botón <i class="fas fa-print"></i>.</li>
+                    <li><strong>Estadísticas:</strong> En el panel de datos, encontrará estadísticas sobre las fincas registradas y beneficiarios.</li>
                 </ul>
                 <p><strong>Nota:</strong> Los campos marcados con * son obligatorios para guardar un registro.</p>
+                <div style="margin-top: 20px; background: #e8f5e9; padding: 15px; border-radius: 8px;">
+                    <h3><i class="fas fa-lightbulb"></i> Consejos Rápidos</h3>
+                    <ul>
+                        <li>Utilice la rueda del mouse para hacer zoom en el mapa</li>
+                        <li>Puede arrastrar el mapa para desplazarse</li>
+                        <li>Haga clic en un marcador para ver la información detallada</li>
+                        <li>Los datos se guardan automáticamente en su dispositivo</li>
+                    </ul>
+                </div>
             </div>
+        </div>
+        
+        <div class="toast" id="toast">
+            <i class="fas fa-check-circle"></i>
+            <span id="toast-message">Operación completada</span>
         </div>
         
         <footer>
@@ -888,10 +1077,23 @@
         map.addLayer(farmCluster);
         map.addLayer(csvCluster);
         
+        // Función para mostrar notificaciones toast
+        function showToast(message, duration = 3000) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        }
+        
         // Función para exportar datos a CSV
         function exportToCSV() {
             if (farmData.length === 0) {
-                alert('No hay datos registrados para exportar.');
+                showToast('No hay datos registrados para exportar.', 4000);
                 return;
             }
             
@@ -913,12 +1115,14 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            
+            showToast('Datos exportados a CSV correctamente');
         }
         
         // Función para guardar datos
         function saveData() {
             if (!currentCoords) {
-                alert('Por favor, seleccione una ubicación en el mapa primero.');
+                showToast('Por favor, seleccione una ubicación en el mapa primero.', 4000);
                 return;
             }
             
@@ -928,7 +1132,7 @@
             const observations = document.getElementById('observations').value;
             
             if (!beneficiary || !farm || !crop) {
-                alert('Por favor, complete todos los campos obligatorios (*).');
+                showToast('Por favor, complete todos los campos obligatorios (*).', 4000);
                 return;
             }
             
@@ -951,9 +1155,11 @@
                 }
                 // Salir del modo edición
                 cancelEdit();
+                showToast('Registro actualizado correctamente');
             } else {
                 // Nuevo registro
                 farmData.push(data);
+                showToast('Datos guardados correctamente');
             }
             
             // Guardar en localStorage
@@ -962,6 +1168,7 @@
             // Actualizar marcadores y lista
             updateMapMarkers();
             updateDataList();
+            updateStats();
             
             // Limpiar formulario
             document.getElementById('beneficiary').value = '';
@@ -971,11 +1178,36 @@
             document.getElementById('coordinates').textContent = 'Datos guardados! Seleccione nueva ubicación';
             currentCoords = null;
             clearTempMarkers();
-            
-            alert('Datos guardados correctamente en este dispositivo.');
         }
         
-        // Función para actualizar marcadores en el mapa
+        // Función para obtener nombre del cultivo
+        function getCropName(cropKey) {
+            const crops = {
+                'cafe': 'Café',
+                'platano': 'Plátano',
+                'maiz': 'Maíz',
+                'frijol': 'Frijol',
+                'hortalizas': 'Hortalizas',
+                'frutales': 'Frutales',
+                'cacao': 'Cacao',
+                'ganaderia': 'Ganadería'
+            };
+            return crops[cropKey] || cropKey;
+        }
+        
+        // Actualizar estadísticas
+        function updateStats() {
+            document.getElementById('total-farms').textContent = farmData.length;
+            
+            // Contar beneficiarios únicos
+            const uniqueBeneficiaries = new Set(farmData.map(data => data.beneficiary));
+            document.getElementById('total-beneficiaries').textContent = uniqueBeneficiaries.size;
+            
+            // Actualizar última actualización
+            document.getElementById('last-update').textContent = 'Hoy';
+        }
+        
+        // Actualizar marcadores en el mapa
         function updateMapMarkers() {
             // Eliminar todos los marcadores existentes del clúster
             farmCluster.clearLayers();
@@ -1003,19 +1235,6 @@
             });
         }
         
-        // Función para obtener nombre del cultivo
-        function getCropName(cropKey) {
-            const crops = {
-                'cafe': 'Café',
-                'platano': 'Plátano',
-                'maiz': 'Maíz',
-                'frijol': 'Frijol',
-                'hortalizas': 'Hortalizas',
-                'frutales': 'Frutales'
-            };
-            return crops[cropKey] || cropKey;
-        }
-        
         // Actualizar lista de datos
         function updateDataList(filter = '') {
             const dataList = document.getElementById('data-list');
@@ -1023,7 +1242,8 @@
             
             const filteredData = farmData.filter(data => 
                 data.beneficiary.toLowerCase().includes(filter.toLowerCase()) || 
-                data.farm.toLowerCase().includes(filter.toLowerCase())
+                data.farm.toLowerCase().includes(filter.toLowerCase()) ||
+                getCropName(data.crop).toLowerCase().includes(filter.toLowerCase())
             );
             
             if (filteredData.length === 0) {
@@ -1128,6 +1348,8 @@
             // Actualizar marcadores
             updateMapMarkers();
             clearTempMarkers();
+            
+            showToast('Edición cancelada');
         }
         
         // Función para eliminar datos
@@ -1139,6 +1361,23 @@
             
             updateMapMarkers();
             updateDataList();
+            updateStats();
+            
+            showToast('Registro eliminado correctamente');
+        }
+        
+        // Función para eliminar todos los datos
+        function deleteAllData() {
+            if (!confirm('¿Está seguro de que desea eliminar TODOS los registros? Esta acción no se puede deshacer.')) return;
+            
+            farmData = [];
+            localStorage.removeItem('farmData');
+            
+            updateMapMarkers();
+            updateDataList();
+            updateStats();
+            
+            showToast('Todos los registros han sido eliminados');
         }
         
         // Función para limpiar marcadores temporales
@@ -1165,6 +1404,7 @@
             document.getElementById('data-btn').classList.add('active');
             document.getElementById('form-btn').classList.remove('active');
             document.getElementById('csv-btn').classList.remove('active');
+            updateStats();
         }
         
         // Mostrar panel de CSV
@@ -1193,7 +1433,7 @@
             const file = fileInput.files[0];
             
             if (!file) {
-                alert('Por favor, seleccione un archivo CSV.');
+                showToast('Por favor, seleccione un archivo CSV.', 4000);
                 return;
             }
             
@@ -1202,7 +1442,7 @@
                 skipEmptyLines: true,
                 complete: function(results) {
                     if (results.errors.length > 0) {
-                        alert('Se encontraron errores en el archivo CSV: ' + results.errors[0].message);
+                        showToast('Se encontraron errores en el archivo CSV: ' + results.errors[0].message, 5000);
                         return;
                     }
                     
@@ -1211,7 +1451,7 @@
                     const firstRow = results.data[0];
                     
                     if (!firstRow) {
-                        alert('El archivo CSV está vacío o no tiene datos válidos.');
+                        showToast('El archivo CSV está vacío o no tiene datos válidos.', 4000);
                         return;
                     }
                     
@@ -1220,7 +1460,7 @@
                     );
                     
                     if (!hasValidFields) {
-                        alert('La estructura del CSV no es válida. Se requieren campos: Beneficiario, Finca, Cultivo, Latitud, Longitud');
+                        showToast('La estructura del CSV no es válida. Se requieren campos: Beneficiario, Finca, Cultivo, Latitud, Longitud', 5000);
                         return;
                     }
                     
@@ -1243,7 +1483,7 @@
                     );
                     
                     if (csvData.length === 0) {
-                        alert('No se encontraron datos válidos en el archivo CSV.');
+                        showToast('No se encontraron datos válidos en el archivo CSV.', 4000);
                         return;
                     }
                     
@@ -1254,7 +1494,7 @@
                     updateCSVTableView();
                     document.getElementById('csv-count').textContent = csvData.length;
                     
-                    alert(`Se cargaron ${csvData.length} registros desde el archivo CSV.`);
+                    showToast(`Se cargaron ${csvData.length} registros desde el archivo CSV.`);
                 }
             });
         }
@@ -1307,7 +1547,7 @@
             csvCluster.clearLayers();
             
             if (csvData.length === 0) {
-                alert('No hay datos CSV cargados para mostrar en el mapa.');
+                showToast('No hay datos CSV cargados para mostrar en el mapa.', 4000);
                 return;
             }
             
@@ -1336,6 +1576,8 @@
             // Ajustar vista del mapa para mostrar todos los marcadores
             const bounds = L.latLngBounds(csvData.map(row => [row.latitud, row.longitud]));
             map.fitBounds(bounds, { padding: [50, 50] });
+            
+            showToast('Datos CSV mostrados en el mapa');
         }
         
         // Limpiar datos CSV
@@ -1347,6 +1589,8 @@
             updateCSVTableView();
             csvCluster.clearLayers();
             document.getElementById('csv-count').textContent = '0';
+            
+            showToast('Datos CSV eliminados');
         }
         
         // Eventos al cargar la página
@@ -1354,6 +1598,7 @@
             // Cargar datos existentes
             updateMapMarkers();
             updateDataList();
+            updateStats();
             
             // Cargar datos CSV si existen
             updateCSVTableView();
@@ -1378,7 +1623,7 @@
                 const marker = L.marker(currentCoords, {
                     icon: L.divIcon({
                         className: 'temp-marker',
-                        html: '<div style="background-color:#e91e63; width:24px; height:24px; border-radius:50%; border:2px solid white; box-shadow:0 0 10px rgba(0,0,0,0.5);"></div>',
+                        html: '<div style="background-color:#4caf50; width:24px; height:24px; border-radius:50%; border:2px solid white; box-shadow:0 0 10px rgba(0,0,0,0.5);"></div>',
                         iconSize: [28, 28]
                     })
                 }).addTo(map);
@@ -1429,6 +1674,7 @@
             });
             
             document.getElementById('export-btn').addEventListener('click', exportToCSV);
+            document.getElementById('clear-all-btn').addEventListener('click', deleteAllData);
             
             document.getElementById('search-input').addEventListener('keyup', function(e) {
                 if (e.key === 'Enter') {
@@ -1492,13 +1738,15 @@
                         }).addTo(map);
                         
                         userMarker.bindPopup('Su ubicación actual').openPopup();
+                        
+                        showToast('Ubicación encontrada');
                     },
                     error => {
-                        alert('No se pudo obtener su ubicación: ' + error.message);
+                        showToast('No se pudo obtener su ubicación: ' + error.message, 4000);
                     }
                 );
             } else {
-                alert('La geolocalización no es soportada por su navegador.');
+                showToast('La geolocalización no es soportada por su navegador.', 4000);
             }
         }
         
@@ -1533,7 +1781,7 @@
                 const title = document.createElement('h1');
                 title.textContent = 'Reporte de Visitas a Fincas';
                 title.style.textAlign = 'center';
-                title.style.marginBottom = '20px';
+                title.style.marginBottom: '20px';
                 title.style.color = '#2e7d32';
                 printContent.appendChild(title);
                 
@@ -1541,7 +1789,7 @@
                 const subtitle = document.createElement('h2');
                 subtitle.textContent = 'Convenio FNC y CVC - Seguridad Alimentaria';
                 subtitle.style.textAlign = 'center';
-                subtitle.style.marginBottom = '30px';
+                subtitle.style.marginBottom: '30px';
                 subtitle.style.color = '#555';
                 subtitle.style.fontSize = '18px';
                 printContent.appendChild(subtitle);
@@ -1555,21 +1803,63 @@
                 mapImg.style.marginBottom = '20px';
                 printContent.appendChild(mapImg);
                 
+                // Estadísticas
+                const statsContainer = document.createElement('div');
+                statsContainer.style.display = 'flex';
+                statsContainer.style.justifyContent = 'space-between';
+                statsContainer.style.marginBottom = '20px';
+                
+                const uniqueBeneficiaries = new Set(farmData.map(data => data.beneficiary));
+                
+                const stats = [
+                    { label: 'Total Fincas', value: farmData.length },
+                    { label: 'Beneficiarios', value: uniqueBeneficiaries.size },
+                    { label: 'Última Actualización', value: new Date().toLocaleDateString('es-CO') }
+                ];
+                
+                stats.forEach(stat => {
+                    const statDiv = document.createElement('div');
+                    statDiv.style.textAlign = 'center';
+                    statDiv.style.padding = '10px';
+                    statDiv.style.border = '1px solid #ddd';
+                    statDiv.style.borderRadius = '8px';
+                    statDiv.style.flex = '1';
+                    statDiv.style.margin = '0 5px';
+                    
+                    const statValue = document.createElement('div');
+                    statValue.textContent = stat.value;
+                    statValue.style.fontSize = '20px';
+                    statValue.style.fontWeight = 'bold';
+                    statValue.style.color = '#2e7d32';
+                    
+                    const statLabel = document.createElement('div');
+                    statLabel.textContent = stat.label;
+                    statLabel.style.fontSize = '14px';
+                    statLabel.style.color = '#666';
+                    
+                    statDiv.appendChild(statValue);
+                    statDiv.appendChild(statLabel);
+                    statsContainer.appendChild(statDiv);
+                });
+                
+                printContent.appendChild(statsContainer);
+                
                 // Tabla de datos
                 const table = document.createElement('table');
                 table.style.width = '100%';
                 table.style.borderCollapse = 'collapse';
                 table.style.marginTop = '20px';
+                table.style.border = '1px solid #ddd';
                 
                 // Cabecera de tabla
                 const thead = document.createElement('thead');
                 thead.innerHTML = `
                     <tr style="background-color: #2e7d32; color: white;">
-                        <th style="padding: 10px; text-align: left;">Finca</th>
-                        <th style="padding: 10px; text-align: left;">Beneficiario</th>
-                        <th style="padding: 10px; text-align: left;">Cultivo</th>
-                        <th style="padding: 10px; text-align: left;">Ubicación</th>
-                        <th style="padding: 10px; text-align: left;">Fecha</th>
+                        <th style="padding: 12px; text-align: left;">Finca</th>
+                        <th style="padding: 12px; text-align: left;">Beneficiario</th>
+                        <th style="padding: 12px; text-align: left;">Cultivo</th>
+                        <th style="padding: 12px; text-align: left;">Ubicación</th>
+                        <th style="padding: 12px; text-align: left;">Fecha</th>
                     </tr>
                 `;
                 table.appendChild(thead);
@@ -1645,6 +1935,8 @@
                     </html>
                 `);
                 printWindow.document.close();
+                
+                showToast('Preparando impresión...');
             });
         }
     </script>
