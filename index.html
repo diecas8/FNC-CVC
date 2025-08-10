@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Geoportal - Seguridad Alimentaria | FNC y CVC</title>
+    <!-- Integrar EmailJS para envío de correos -->
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3.2.0/dist/email.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
@@ -250,12 +252,31 @@
             justify-content: center;
             gap: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: relative;
         }
         
         .btn:hover, .btn:active {
             background: #1b5e20;
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .btn.btn-loading {
+            color: transparent !important;
+        }
+        
+        .btn.btn-loading:after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin: -10px 0 0 -10px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s linear infinite;
         }
         
         .btn-secondary {
@@ -620,6 +641,11 @@
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
         /* Control de capas personalizado */
@@ -1013,19 +1039,30 @@
             display: block !important;
         }
         
-        /* Mejoras para móvil */
+        /* MEJORAS PARA MÓVILES (Formulario compacto) */
         @media (max-width: 767px) {
-            .panel {
-                padding: 12px;
+            .floating-panel {
+                height: 35vh !important;
+                max-height: 35vh;
+                top: auto;
+                bottom: 0;
+                transform: translateY(100%);
+                border-radius: 20px 20px 0 0;
+                padding: 12px 15px 5px;
             }
             
-            .panel h2 {
-                font-size: 16px;
-                margin-bottom: 10px;
+            .floating-panel.active {
+                transform: translateY(0);
+            }
+            
+            .panel {
+                padding: 10px;
+                overflow-y: auto;
+                max-height: calc(35vh - 40px);
             }
             
             .form-group {
-                margin-bottom: 10px;
+                margin-bottom: 8px;
             }
             
             input, select, textarea {
@@ -1033,14 +1070,20 @@
                 font-size: 13px;
             }
             
+            .btn {
+                padding: 10px;
+                font-size: 13px;
+            }
+            
             .coordinates, .elevation-info {
                 font-size: 12px;
                 padding: 8px;
+                margin: 5px 0;
             }
             
-            .btn {
-                padding: 10px 12px;
-                font-size: 13px;
+            .panel h2 {
+                font-size: 16px;
+                margin-bottom: 10px;
             }
             
             .data-item {
@@ -1107,11 +1150,6 @@
             height: 30px;
             animation: spin 1s linear infinite;
             margin: 0 auto 10px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -1441,6 +1479,11 @@
     </div>
 
     <script>
+        // Inicializar EmailJS (REEMPLAZAR CON TUS CREDENCIALES)
+        (function() {
+            emailjs.init("TU_USER_ID_DE_EMAILJS"); 
+        })();
+
         // Inicializar mapa
         const map = L.map('map').setView([3.4516, -76.5320], 10); // Centro en Valle del Cauca
         
@@ -1536,25 +1579,40 @@
             }, duration);
         }
         
-        // Función para enviar datos por correo
+        // Función para enviar datos por correo (USANDO EMAILJS)
         async function sendEmail(data) {
             const emailLoader = document.getElementById('email-loader');
+            const saveBtn = document.getElementById('save-btn');
+            
+            // Mostrar cargador
             emailLoader.style.display = 'block';
+            saveBtn.classList.add('btn-loading');
             
             try {
-                // Simulamos el envío de correo (en producción usarías un servicio real)
-                // Este es un ejemplo usando Formspree u otro servicio
-                await new Promise(resolve => setTimeout(resolve, 1500));
-                
-                // En un caso real, aquí harías una petición a tu servidor o servicio de correo
-                console.log('Datos enviados por correo:', data);
+                const templateParams = {
+                    beneficiary: data.beneficiary,
+                    farm: data.farm,
+                    crop: getCropName(data.crop),
+                    elevation: data.elevation,
+                    coords: `${data.coords.lat.toFixed(6)}, ${data.coords.lng.toFixed(6)}`,
+                    observations: data.observations || 'Ninguna',
+                    date: data.date
+                };
+
+                // Enviar usando EmailJS (REEMPLAZAR CON TUS IDs)
+                await emailjs.send(
+                    'TU_SERVICE_ID',     // Reemplazar con tu service ID
+                    'TU_TEMPLATE_ID',    // Reemplazar con tu template ID
+                    templateParams
+                );
                 
                 showToast('Datos enviados al servidor');
             } catch (error) {
                 console.error('Error enviando correo:', error);
-                showToast('Error enviando datos al servidor', 4000);
+                showToast('Error enviando datos: ' + error.text, 4000);
             } finally {
                 emailLoader.style.display = 'none';
+                saveBtn.classList.remove('btn-loading');
             }
         }
         
@@ -1573,14 +1631,14 @@
             // Validar campos requeridos
             let isValid = true;
             
-            if (!beneficiary) {
+            if (!beneficiary.trim()) {
                 document.getElementById('beneficiary-error').style.display = 'block';
                 isValid = false;
             } else {
                 document.getElementById('beneficiary-error').style.display = 'none';
             }
             
-            if (!farm) {
+            if (!farm.trim()) {
                 document.getElementById('farm-error').style.display = 'block';
                 isValid = false;
             } else {
@@ -1595,7 +1653,7 @@
             }
             
             if (!isValid) {
-                showToast('Complete campos obligatorios', 4000);
+                showToast('Complete todos los campos obligatorios', 4000);
                 return;
             }
             
@@ -2337,6 +2395,15 @@
                 year: 'numeric', 
                 month: 'long', 
                 day: 'numeric' 
+            });
+            
+            // Cerrar paneles al hacer clic fuera
+            document.addEventListener('click', (e) => {
+                if (activePanel && 
+                    !document.getElementById(activePanel).contains(e.target) &&
+                    !Array.from(document.querySelectorAll('.floating-btn')).includes(e.target)) {
+                    closePanels();
+                }
             });
         });
         
