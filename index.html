@@ -770,10 +770,11 @@
             
             .floating-panel.active {
                 transform: none;
+                display: block;
             }
             
             .close-panel-btn {
-                display: none;
+                display: block;
             }
             
             header {
@@ -866,6 +867,17 @@
         #print-map {
             height: 100%;
             width: 100%;
+            position: relative;
+        }
+        
+        .loading-map {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #2e7d32;
+            font-size: 16px;
+            font-weight: 500;
         }
         
         .print-info {
@@ -1000,6 +1012,24 @@
             right: 10px;
             z-index: 1000;
         }
+        
+        /* Nuevos estilos para validación */
+        .form-group.required label::after {
+            content: " *";
+            color: #f44336;
+        }
+        
+        .form-error {
+            color: #f44336;
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+        
+        /* Botón de cierre visible en todos los dispositivos */
+        .close-panel-btn {
+            display: block !important;
+        }
     </style>
 </head>
 <body>
@@ -1077,18 +1107,20 @@
                 <div class="coordinates" id="coordinates">Haga clic en el mapa para capturar coordenadas</div>
                 <div class="elevation-info" id="elevation-info">Altura sobre el nivel del mar: <span class="elevation-value" id="elevation-value">--</span> m</div>
                 
-                <div class="form-group">
-                    <label for="beneficiary">Nombre del Beneficiario *</label>
+                <div class="form-group required">
+                    <label for="beneficiary">Nombre del Beneficiario</label>
                     <input type="text" id="beneficiary" placeholder="Ingrese el nombre completo">
+                    <div class="form-error" id="beneficiary-error">Este campo es obligatorio</div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="farm">Nombre de la Finca *</label>
+                <div class="form-group required">
+                    <label for="farm">Nombre de la Finca</label>
                     <input type="text" id="farm" placeholder="Ingrese el nombre de la finca">
+                    <div class="form-error" id="farm-error">Este campo es obligatorio</div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="crop">Cultivo Principal *</label>
+                <div class="form-group required">
+                    <label for="crop">Cultivo Principal</label>
                     <select id="crop">
                         <option value="">Seleccione un cultivo</option>
                         <option value="cafe">Café</option>
@@ -1099,6 +1131,7 @@
                         <option value="frutales">Frutales</option>
                         <option value="cacao">Cacao</option>
                     </select>
+                    <div class="form-error" id="crop-error">Seleccione un cultivo</div>
                 </div>
                 
                 <div class="form-group">
@@ -1349,6 +1382,7 @@
         let csvData = JSON.parse(localStorage.getItem('csvData')) || [];
         let printMapInstance = null;
         let currentPrintData = null;
+        let activePanel = null;
         
         // Grupos de clústeres para evitar superposición
         const farmCluster = L.markerClusterGroup({
@@ -1424,7 +1458,31 @@
             const crop = document.getElementById('crop').value;
             const observations = document.getElementById('observations').value;
             
-            if (!beneficiary || !farm || !crop) {
+            // Validar campos requeridos
+            let isValid = true;
+            
+            if (!beneficiary) {
+                document.getElementById('beneficiary-error').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('beneficiary-error').style.display = 'none';
+            }
+            
+            if (!farm) {
+                document.getElementById('farm-error').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('farm-error').style.display = 'none';
+            }
+            
+            if (!crop) {
+                document.getElementById('crop-error').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('crop-error').style.display = 'none';
+            }
+            
+            if (!isValid) {
                 showToast('Complete campos obligatorios', 4000);
                 return;
             }
@@ -1614,13 +1672,16 @@
             if (!data) return;
             
             // Mostrar formulario
-            showFormPanel();
+            showPanel('form-panel');
             
             // Rellenar formulario con datos
             document.getElementById('beneficiary').value = data.beneficiary;
             document.getElementById('farm').value = data.farm;
             document.getElementById('crop').value = data.crop;
             document.getElementById('observations').value = data.observations || '';
+            
+            // Ocultar errores
+            document.querySelectorAll('.form-error').forEach(el => el.style.display = 'none');
             
             // Establecer coordenadas y elevación
             currentCoords = data.coords;
@@ -1669,6 +1730,9 @@
             currentCoords = null;
             currentElevation = null;
             
+            // Ocultar errores
+            document.querySelectorAll('.form-error').forEach(el => el.style.display = 'none');
+            
             // Actualizar marcadores
             updateMapMarkers();
             clearTempMarkers();
@@ -1710,45 +1774,30 @@
             tempMarkers.length = 0;
         }
         
-        // Mostrar panel de formulario
-        function showFormPanel() {
-            document.getElementById('data-panel').classList.remove('active');
-            document.getElementById('csv-panel').classList.remove('active');
-            document.getElementById('form-panel').classList.add('active');
-            document.getElementById('form-btn').classList.add('active');
-            document.getElementById('data-btn').classList.remove('active');
-            document.getElementById('csv-btn').classList.remove('active');
-        }
-        
-        // Mostrar panel de datos
-        function showDataPanel() {
-            document.getElementById('form-panel').classList.remove('active');
-            document.getElementById('csv-panel').classList.remove('active');
-            document.getElementById('data-panel').classList.add('active');
-            document.getElementById('data-btn').classList.add('active');
-            document.getElementById('form-btn').classList.remove('active');
-            document.getElementById('csv-btn').classList.remove('active');
-            updateStats();
-        }
-        
-        // Mostrar panel de CSV
-        function showCSVPanel() {
-            document.getElementById('form-panel').classList.remove('active');
-            document.getElementById('data-panel').classList.remove('active');
-            document.getElementById('csv-panel').classList.add('active');
-            document.getElementById('csv-btn').classList.add('active');
-            document.getElementById('form-btn').classList.remove('active');
-            document.getElementById('data-btn').classList.remove('active');
+        // Mostrar panel específico
+        function showPanel(panelId) {
+            closePanels();
+            document.getElementById(panelId).classList.add('active');
+            activePanel = panelId;
+            
+            // Actualizar estado de botones
+            document.querySelectorAll('.floating-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`#${panelId.replace('-panel', '-btn')}`).classList.add('active');
         }
         
         // Cerrar todos los paneles
         function closePanels() {
-            document.getElementById('form-panel').classList.remove('active');
-            document.getElementById('data-panel').classList.remove('active');
-            document.getElementById('csv-panel').classList.remove('active');
-            document.getElementById('form-btn').classList.remove('active');
-            document.getElementById('data-btn').classList.remove('active');
-            document.getElementById('csv-btn').classList.remove('active');
+            document.querySelectorAll('.floating-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            activePanel = null;
+            
+            // Restablecer botones
+            document.querySelectorAll('.floating-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
         }
         
         // Función para mostrar la ventana de impresión
@@ -1763,9 +1812,15 @@
             // Deshabilitar botón de impresión hasta que se seleccione un beneficiario
             document.getElementById('print-map-btn').disabled = true;
             
+            // Mostrar indicador de carga
+            document.getElementById('print-map').innerHTML = '<div class="loading-map">Cargando mapa...</div>';
+            
             // Si se proporcionan datos, mostrarlos directamente
             if (data) {
-                updatePrintView(data);
+                // Retrasar ligeramente para permitir la renderización del overlay
+                setTimeout(() => {
+                    updatePrintView(data);
+                }, 100);
             }
         }
         
@@ -1841,49 +1896,74 @@
             }
             
             // Crear nuevo mapa
-            printMapInstance = L.map('print-map').setView(data.coords, 16);
+            printMapInstance = L.map('print-map', {
+                zoomControl: false,
+                attributionControl: false
+            }).setView(data?.coords || [3.4516, -76.5320], 15);
             
-            // Añadir capa base (usar la misma que el mapa principal)
-            const currentBaseLayer = map.getLayers()[0];
-            let baseLayer;
-            
-            if (currentBaseLayer instanceof L.TileLayer) {
-                baseLayer = L.tileLayer(currentBaseLayer._url, currentBaseLayer.options);
-            } else {
-                // Por defecto, si no se puede determinar, usar Esri Satelital
-                baseLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics'
-                });
-            }
-            
-            baseLayer.addTo(printMapInstance);
+            // Añadir capa base con reintentos
+            addBaseLayerWithRetry(printMapInstance, 3);
             
             // Añadir círculo de 500 metros
-            L.circle(data.coords, {
-                radius: 500,
-                color: '#3388ff',
-                fillColor: '#3388ff',
-                fillOpacity: 0.2,
-                weight: 2
-            }).addTo(printMapInstance);
+            if (data) {
+                L.circle(data.coords, {
+                    radius: 500,
+                    color: '#3388ff',
+                    fillColor: '#3388ff',
+                    fillOpacity: 0.2,
+                    weight: 2
+                }).addTo(printMapInstance);
+                
+                // Añadir marcador en la ubicación
+                L.marker(data.coords, {
+                    icon: L.divIcon({
+                        className: 'print-marker',
+                        html: '<div style="background-color:#e91e63; width:26px; height:26px; border-radius:50%; border:2px solid white; box-shadow:0 0 10px rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center;"><i class="fas fa-map-marker-alt" style="color:white; font-size:14px;"></i></div>',
+                        iconSize: [30, 30]
+                    })
+                }).addTo(printMapInstance);
+                
+                // Añadir etiqueta del radio
+                L.marker(data.coords, {
+                    icon: L.divIcon({
+                        className: 'radius-label',
+                        html: `<div style="background:rgba(255,255,255,0.85); padding:4px 8px; border-radius:4px; font-size:12px; border-left:3px solid #3388ff;">Radio: 500m</div>`,
+                        iconSize: [0, 0] // Tamaño cero para usar solo el HTML
+                    })
+                }).addTo(printMapInstance);
+            }
             
-            // Añadir marcador en la ubicación
-            L.marker(data.coords, {
-                icon: L.divIcon({
-                    className: 'print-marker',
-                    html: '<div style="background-color:#e91e63; width:26px; height:26px; border-radius:50%; border:2px solid white; box-shadow:0 0 10px rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center;"><i class="fas fa-map-marker-alt" style="color:white; font-size:14px;"></i></div>',
-                    iconSize: [30, 30]
-                })
-            }).addTo(printMapInstance);
-            
-            // Añadir etiqueta del radio
-            L.marker(data.coords, {
-                icon: L.divIcon({
-                    className: 'radius-label',
-                    html: `<div style="background:rgba(255,255,255,0.85); padding:4px 8px; border-radius:4px; font-size:12px; border-left:3px solid #3388ff;">Radio: 500m</div>`,
-                    iconSize: [0, 0] // Tamaño cero para usar solo el HTML
-                })
-            }).addTo(printMapInstance);
+            // Forzar recálculo del tamaño
+            setTimeout(() => {
+                printMapInstance.invalidateSize();
+            }, 100);
+        }
+        
+        // Función para añadir capa base con reintentos
+        function addBaseLayerWithRetry(mapInstance, retries) {
+            try {
+                const currentBaseLayer = map.getLayers()[0];
+                let baseLayer;
+                
+                if (currentBaseLayer instanceof L.TileLayer) {
+                    baseLayer = L.tileLayer(currentBaseLayer._url, currentBaseLayer.options);
+                } else {
+                    baseLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                        attribution: 'Tiles © Esri'
+                    });
+                }
+                
+                baseLayer.addTo(mapInstance);
+                mapInstance.invalidateSize();
+            } catch (error) {
+                console.error('Error adding base layer:', error);
+                if (retries > 0) {
+                    setTimeout(() => addBaseLayerWithRetry(mapInstance, retries - 1), 500);
+                } else {
+                    // Mostrar mensaje de error
+                    document.getElementById('print-map').innerHTML = '<div class="loading-map" style="color: #f44336;">Error cargando el mapa base. Intente nuevamente.</div>';
+                }
+            }
         }
         
         // Función para imprimir el mapa
@@ -2062,27 +2142,18 @@
             
             // Botones de control flotantes
             document.getElementById('form-btn').addEventListener('click', function() {
-                if (document.getElementById('form-panel').classList.contains('active')) {
-                    closePanels();
-                } else {
-                    showFormPanel();
-                }
+                if (activePanel === 'form-panel') closePanels();
+                else showPanel('form-panel');
             });
             
             document.getElementById('data-btn').addEventListener('click', function() {
-                if (document.getElementById('data-panel').classList.contains('active')) {
-                    closePanels();
-                } else {
-                    showDataPanel();
-                }
+                if (activePanel === 'data-panel') closePanels();
+                else showPanel('data-panel');
             });
             
             document.getElementById('csv-btn').addEventListener('click', function() {
-                if (document.getElementById('csv-panel').classList.contains('active')) {
-                    closePanels();
-                } else {
-                    showCSVPanel();
-                }
+                if (activePanel === 'csv-panel') closePanels();
+                else showPanel('csv-panel');
             });
             
             document.getElementById('location-btn').addEventListener('click', locateUser);
